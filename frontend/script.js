@@ -9,6 +9,45 @@ function screenShake() {
   setTimeout(() => gc.classList.remove('shake'), 500);
 }
 
+function createWallSparks(x, y, direction = 'right') {
+  for (let i = 0; i < 5; i++) {
+    const spark = document.createElement('div');
+    spark.classList.add('wall-spark');
+    spark.style.left = x + (direction === 'right' ? 25 : 0) + 'px';
+    spark.style.top = (y + Math.random() * 20) + 'px';
+    
+    gc.appendChild(spark);
+    
+    setTimeout(() => spark.remove(), 500);
+  }
+}
+
+function createLevelFlash() {
+  const flash = document.createElement('div');
+  flash.classList.add('level-flash');
+  gc.appendChild(flash);
+  
+  setTimeout(() => flash.remove(), 600);
+}
+
+function createPortalWarp(x, y) {
+  // Create warp effect
+  for (let i = 0; i < 15; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('warp-particle');
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    
+    const angle = (Math.PI * 2 * i) / 15;
+    const distance = 50;
+    particle.style.setProperty('--warp-x', Math.cos(angle) * distance + 'px');
+    particle.style.setProperty('--warp-y', Math.sin(angle) * distance + 'px');
+    
+    gc.appendChild(particle);
+    setTimeout(() => particle.remove(), 800);
+  }
+}
+
 function secondsToTime(e) {
   var totalSeconds = Math.floor(e / 45); // Convert frames (45fps) to seconds
   var m = Math.floor(totalSeconds / 60).toString().padStart(2, '0'),
@@ -158,6 +197,7 @@ var gravity = 8,
   gpa,
   dbljump = false,
   dash = false,
+  transitioning = false,
   timer = 0,
   deaths = 0,
   level_num = -1;
@@ -328,6 +368,10 @@ function buildGame(shouldStart = true) {
     return; // Stop building next level
   }
 
+  // Level transition flash
+  if (level_num > 0) {
+    createLevelFlash();
+  }
 
   let tc = document.querySelector('#time_counter')
   let dc = document.querySelector('#deaths_counter')
@@ -415,12 +459,10 @@ function buildGame(shouldStart = true) {
       // if player on ground set new top
       if (pl_xy1.classList.contains('ground') ||
         pl_xy2.classList.contains('ground')) {
-        // Only play land sound if gravity was pulling down (falling)
-        if (gravity > 0 && !pl_xy1.classList.contains('tile')) {
-             // simplified check to avoid landing sound when walking on flat ground
-        }
         // Better landing check: if we were previously in air (gravity > 0)
-        if (gravity > 0) sfx.land();
+        if (gravity > 3) {
+          sfx.land();
+        }
         
         gravity = 0
         if (pl.classList.contains('jumping')) {
@@ -491,6 +533,8 @@ function buildGame(shouldStart = true) {
             dbljump = false
             gravity = 1
             pl.style.transform = 'rotate(90deg)'
+            // Wall slide sparks
+            createWallSparks(pl_loc.left - gc_loc.left, pl_loc.top - gc_loc.top, 'left');
           }
           pl.className = ''
         }
@@ -510,6 +554,8 @@ function buildGame(shouldStart = true) {
             dbljump = false
             gravity = 1
             pl.style.transform = 'rotate(-90deg)'
+            // Wall slide sparks
+            createWallSparks(pl_loc.left - gc_loc.left, pl_loc.top - gc_loc.top, 'right');
           }
           pl.className = ''
         }
@@ -549,9 +595,15 @@ function buildGame(shouldStart = true) {
         x = pl_loc.left
       }
 
-      if (pl_center.classList.contains('nextlevel')) {
+      if (pl_center.classList.contains('nextlevel') && !transitioning) {
+        transitioning = true;
         sfx.win(); // Win sound
-        buildGame()
+        // Portal warp effect
+        createPortalWarp(pl_loc.left - gc_loc.left + 12.5, pl_loc.top - gc_loc.top + 12.5);
+        setTimeout(() => {
+          transitioning = false;
+          buildGame();
+        }, 400);
       }
 
       timer++
@@ -679,30 +731,28 @@ function initWillemLoadingAnimation(onComplete) {
 		tl.fromTo(coverImageExtra, { opacity: 1 }, { opacity: 0, duration: 0.05, ease: 'none', stagger: 0.5 }, '-=0.05')
 	}
 
-    // Zoom واحد بس مع تحريك الحروف بعيد
+    // المرحلة الأولى: Zoom بسيط
     if (box.length) {
         tl.to(box, {
-            scale: 3,
-            duration: 1.5,
+            scale: 2.5,
+            duration: 1.2,
             ease: 'power2.inOut'
         }, '+=0.3');
     }
 
-    // الحروف تبعد عن المستطيل أثناء الـ zoom
+    // إبعاد كلمة HASSAN أثناء الزوم
     if (headingStart.length) {
         tl.to(headingStart, {
-            x: '-15em',
-            opacity: 0.3,
-            duration: 1.5,
+            x: '-200%',
+            duration: 1.2,
             ease: 'power2.inOut'
         }, '<');
     }
-
+    
     if (headingEnd.length) {
         tl.to(headingEnd, {
-            x: '15em',
-            opacity: 0.3,
-            duration: 1.5,
+            x: '200%',
+            duration: 1.2,
             ease: 'power2.inOut'
         }, '<');
     }
