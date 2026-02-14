@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --root-clr: dimgray;
   --tile-line-height: 30px;
@@ -621,6 +629,7 @@ main:has(.willem-header.is--loading) {
 }
 
 .willem__h1 {
+  font-family: 'Courier New', Courier, monospace;
   white-space: nowrap;
   justify-content: center;
   font-size: 12.5em;
@@ -852,10 +861,4 @@ main:has(.willem-header.is--loading) {
   }
 }
 
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+
