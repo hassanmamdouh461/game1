@@ -153,11 +153,9 @@ var gravity = 8,
   bonus = 1,
   dead = false,
   kd_list = [],
-  d = {},
+  keys = {},
   gp,
   gpa,
-  dbljump = false,
-  dash = false,
   dbljump = false,
   dash = false,
   timer = 0,
@@ -341,47 +339,44 @@ function buildGame(shouldStart = true) {
 
   // add tiles for new level
   for (var i = 0; i < cols * rows; i++) {
-    var d = document.createElement('div')
-    d.className = 'tile'
+    var tile = document.createElement('div')
+    tile.className = 'tile'
 
     if (levels[level_num].map[i] == 0) {
-      d.className = 'tile ground'
-      // d.style.background = 'dimgray'
+      tile.className = 'tile ground'
     }
     if (levels[level_num].map[i] == 2) {
-      d.className = 'tile lava'
+      tile.className = 'tile lava'
     }
     if (levels[level_num].map[i] == 3) {
-      d.className = 'tile lava spleft'
+      tile.className = 'tile lava spleft'
     }
     if (levels[level_num].map[i] == 4) {
-      d.className = 'tile lava sptop'
+      tile.className = 'tile lava sptop'
     }
     if (levels[level_num].map[i] == 5) {
-      d.className = 'tile lava spright'
+      tile.className = 'tile lava spright'
     }
     if (levels[level_num].map[i] == 6) {
-      d.className = 'tile portal1'
+      tile.className = 'tile portal1'
     }
     if (levels[level_num].map[i] == 7) {
-      d.className = 'tile portal2'
+      tile.className = 'tile portal2'
     }
     if (levels[level_num].map[i] == 8) {
-      d.className = 'tile innerwall'
+      tile.className = 'tile innerwall'
     }
     if (levels[level_num].map[i] == 9) {
-      d.className = 'tile nextlevel'
+      tile.className = 'tile nextlevel'
     }
-    d.setAttribute('grid_loc', [i % cols, Math.floor(i / cols)])
-    d.style.width = tile_size + 'px'
-    d.style.height = tile_size + 'px'
-    d.style.position = 'absolute'
-    // d.innerHTML = i
-    // d.style.outline = '1px dotted gray'
-    d.style.left = (i % cols) * tile_size + 'px'
-    d.style.top = Math.floor(i / cols) * tile_size + 'px'
+    tile.setAttribute('grid_loc', [i % cols, Math.floor(i / cols)])
+    tile.style.width = tile_size + 'px'
+    tile.style.height = tile_size + 'px'
+    tile.style.position = 'absolute'
+    tile.style.left = (i % cols) * tile_size + 'px'
+    tile.style.top = Math.floor(i / cols) * tile_size + 'px'
 
-    gc.appendChild(d)
+    gc.appendChild(tile)
   }
 
   // add player stuff
@@ -449,7 +444,7 @@ function buildGame(shouldStart = true) {
       var gp = gamepads[0];
 
       // add jump-force (change the gravity)
-      if ((d[38]
+      if ((keys[38]
         || (gp && (gp.buttons[0].pressed
           || gp.buttons[1].pressed
           || gp.buttons[2].pressed
@@ -460,7 +455,7 @@ function buildGame(shouldStart = true) {
         pl.classList.add('jumping'); // Start spinning
         sfx.jump(); // Sound effect
       }
-      if ((d[38]
+      if ((keys[38]
         || (gp && (gp.buttons[0].pressed
           || gp.buttons[1].pressed
           || gp.buttons[2].pressed
@@ -483,7 +478,7 @@ function buildGame(shouldStart = true) {
       }
 
       // track left/right movement
-      if ((d[37] || (gp && gpa == -1)) && x > gc_loc.x) {
+      if ((keys[37] || (gp && gpa == -1)) && x > gc_loc.x) {
         if (!pl_xy3.classList.contains('ground')) {
           x -= x_speed
           // Only add goleft if NOT jumping (jumping overrides rotation)
@@ -502,7 +497,7 @@ function buildGame(shouldStart = true) {
       }
 
       // console.log(x_speed)
-      if ((d[39] || (gp && gpa == 1)) && x + pl_loc.width < gc_loc.x + gc_loc.width) {
+      if ((keys[39] || (gp && gpa == 1)) && x + pl_loc.width < gc_loc.x + gc_loc.width) {
         if (!pl_xy4.classList.contains('ground')) {
           x += x_speed
           // Only add goright if NOT jumping
@@ -606,23 +601,27 @@ function buildGame(shouldStart = true) {
 
   }
 
-  // key tracking
-  if (level_num > 0) {
+  // key tracking — register listeners only once
+  if (!window._keyListenersAdded) {
+    window._keyListenersAdded = true;
     window.addEventListener('keydown', function (e) {
-      d[e.which] = true;
-    })
-    window.addEventListener('keyup', function (e) {
-      d[e.which] = false;
-      pl.className = ''
-      pl.style.transform = 'rotate(0deg)'
-    })
-    window.addEventListener("gamepadconnected", function (e) {
-      var gp = navigator.getGamepads()[e.gamepad.index];
-      // console.log("A " + gp.id + " was successfully detected! There are a total of " + gp.buttons.length + " buttons.")
+      keys[e.which] = true;
     });
-  } else {
-    timer = 0
-    deaths = 0
+    window.addEventListener('keyup', function (e) {
+      keys[e.which] = false;
+      var currentPl = document.querySelector('#' + player);
+      if (currentPl) {
+        currentPl.className = '';
+        currentPl.style.transform = 'rotate(0deg)';
+      }
+    });
+    window.addEventListener('gamepadconnected', function (e) {
+      var gp = navigator.getGamepads()[e.gamepad.index];
+    });
+  }
+  if (level_num === 0) {
+    timer = 0;
+    deaths = 0;
   }
 }
 
@@ -680,14 +679,33 @@ function initWillemLoadingAnimation(onComplete) {
 		tl.fromTo(coverImageExtra, { opacity: 1 }, { opacity: 0, duration: 0.05, ease: 'none', stagger: 0.5 }, '-=0.05')
 	}
 
+    // Zoom واحد بس مع تحريك الحروف بعيد
+    if (box.length) {
+        tl.to(box, {
+            scale: 3,
+            duration: 1.5,
+            ease: 'power2.inOut'
+        }, '+=0.3');
+    }
 
-	// (Zoom/Expansion phase removed per user request)
+    // الحروف تبعد عن المستطيل أثناء الـ zoom
+    if (headingStart.length) {
+        tl.to(headingStart, {
+            x: '-15em',
+            opacity: 0.3,
+            duration: 1.5,
+            ease: 'power2.inOut'
+        }, '<');
+    }
 
-	// (Header letters and nav links animations removed since they are hidden via CSS)
-
-	// (Header letters and nav links animations removed since they are hidden via CSS)
-    // Add a slight pause at the end for the user to see the result before fading
-    tl.to({}, {duration: 3});
+    if (headingEnd.length) {
+        tl.to(headingEnd, {
+            x: '15em',
+            opacity: 0.3,
+            duration: 1.5,
+            ease: 'power2.inOut'
+        }, '<');
+    }
 }
 
 window.addEventListener('load', function() {

@@ -1,0 +1,9 @@
+{
+  "name": "spiky-dasher-game",
+  "version": "1.0.0",
+  "description": "Spiky Dasher - A platformer game",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.js"
+  }
+}
