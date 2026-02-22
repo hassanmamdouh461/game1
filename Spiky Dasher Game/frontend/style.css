@@ -154,26 +154,9 @@ h2 {
 }
 
 .nextlevel {
-  background:
-    linear-gradient(180deg, transparent 0%, transparent 60%, rgba(0,255,150,0.15) 60%),
-    repeating-linear-gradient(
-      45deg,
-      rgba(0,255,150,0.12) 0px,
-      rgba(0,255,150,0.12) 3px,
-      transparent 3px,
-      transparent 9px
-    );
-  border: 1px solid rgba(0,255,150,0.5);
-  box-shadow:
-    inset 0 0 8px rgba(0,255,150,0.4),
-    0 0 6px rgba(0,255,150,0.6);
-  animation: exit-pulse 1.2s ease-in-out infinite alternate;
-  z-index: 3;
-}
-
-@keyframes exit-pulse {
-  from { box-shadow: inset 0 0 8px rgba(0,255,150,0.4), 0 0 6px rgba(0,255,150,0.6); }
-  to   { box-shadow: inset 0 0 18px rgba(0,255,150,0.8), 0 0 16px rgba(0,255,150,1); }
+  /*   background:
+  linear-gradient(to bottom right, transparent 10%, var(--root-clr) 10% 30%, transparent 30% 60%, var(--root-clr) 60% 80%, transparent 80%);
+  background-size: 25px 25px; */
 }
 
 #player,
@@ -460,11 +443,6 @@ h2 {
   color: white;
   text-shadow: 0 0 10px cyan;
   animation: blink-text 1s infinite;
-}
-
-@keyframes blink-text {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0.4; }
 }
 
 @keyframes intro-scroll {
@@ -1000,153 +978,6 @@ main:has(.willem-header.is--loading) {
 @media screen and (max-width: 991px) {
   .osmo-credits__p {
     display: none;
-  }
-}
-
-/* ============================================
-   PAUSE SCREEN
-   ============================================ */
-#pause_screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1500000;
-  backdrop-filter: blur(4px);
-}
-
-.pause-content {
-  border: 3px solid cyan;
-  padding: 40px 70px;
-  background: rgba(0, 0, 0, 0.9);
-  box-shadow: 0 0 40px cyan, inset 0 0 20px rgba(0, 255, 255, 0.1);
-  border-radius: 16px;
-  text-align: center;
-  animation: pause-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-@keyframes pause-pop {
-  from { transform: scale(0.85); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
-}
-
-.pause-title {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 3rem;
-  color: #fff;
-  margin: 0 0 20px 0;
-  letter-spacing: 8px;
-  text-shadow:
-    0 0 5px #fff,
-    0 0 20px cyan,
-    0 0 50px cyan;
-  animation: pause-flicker 2s linear infinite;
-}
-
-@keyframes pause-flicker {
-  0%, 95%, 100% { opacity: 1; }
-  96%            { opacity: 0.6; }
-  97%            { opacity: 1; }
-  98%            { opacity: 0.4; }
-}
-
-.pause-hint {
-  font-family: 'Courier New', Courier, monospace;
-  color: #aaa;
-  font-size: 0.95rem;
-  margin: 8px 0;
-  letter-spacing: 1px;
-}
-
-.pause-hint kbd {
-  background: rgba(0,255,255,0.15);
-  border: 1px solid cyan;
-  border-radius: 4px;
-  padding: 1px 7px;
-  color: cyan;
-  font-family: inherit;
-}
-
-/* ============================================
-   TOUCH CONTROLS (Mobile)
-   ============================================ */
-#touch_controls {
-  display: none; /* shown only on touch devices via JS */
-  position: fixed;
-  bottom: 20px;
-  left: 0;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
-  z-index: 1000000;
-  pointer-events: none;
-}
-
-.touch-btn {
-  pointer-events: all;
-  width: 70px;
-  height: 70px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 2px solid rgba(0, 255, 255, 0.6);
-  border-radius: 50%;
-  color: cyan;
-  font-size: 1.6rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
-  transition: background 0.1s, box-shadow 0.1s;
-  -webkit-user-select: none;
-}
-
-.touch-btn:active,
-.touch-btn.pressed {
-  background: rgba(0, 255, 255, 0.25);
-  box-shadow: 0 0 25px cyan;
-}
-
-#touch_jump {
-  width: 80px;
-  height: 80px;
-  font-size: 1.8rem;
-}
-
-/* ============================================
-   RESPONSIVE — scale game on small screens
-   ============================================ */
-@media screen and (max-width: 1040px) {
-  html, body {
-    overflow: hidden;
-    align-items: center;
-    justify-content: center;
-  }
-
-  #game_console {
-    transform-origin: center center;
-    /* JS sets --game-scale on resize */
-    transform: scale(var(--game-scale, 1));
-  }
-
-  #touch_controls {
-    display: flex;
-  }
-}
-
-@media screen and (hover: none) and (pointer: coarse) {
-  /* Always show touch controls on touch-only devices */
-  #touch_controls {
-    display: flex;
   }
 }
 
