@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Spiky Dasher Game | @coding.stella</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Osmo Loading Animation -->
+  <section class="willem-header is--loading">
+     <div class="willem-loader">
+        <div class="willem__h1">
+           <div class="willem__h1-start">
+              <span class="willem__letter">H</span>
+              <span class="willem__letter">A</span>
+              <span class="willem__letter">S</span>
+           </div>
+           <div class="willem-loader__box">
+              <div class="willem-loader__box-inner">
+                 <div class="willem__growing-image">
+                    <div class="willem__growing-image-wrap">
+                       <video class="willem__cover-image"
+                          src="IMG_4040.MP4"
+                          autoplay muted playsinline loop></video>
+                    </div>
+                 </div>
+              </div>
+           </div>
+           <div class="willem__h1-end">
+              <span class="willem__letter">S</span>
+              <span class="willem__letter">A</span>
+              <span class="willem__letter">N</span>
+           </div>
+        </div>
+     </div>
+     <div class="willem-header__content">
+      <!-- Content removed to fix duplicate text issues -->
+     </div>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+
+  <!-- arrow keys to move and jump -->
+  <!-- also a double jump -->
+  <div id="loading_screen" style="display: none;">
+    <div class="intro-scene">
+      <div class="intro-player"></div>
+      <div class="intro-floor">
+        <div class="intro-obstacle"></div>
+        <div class="intro-obstacle" style="left: 300px"></div>
+        <div class="intro-obstacle" style="left: 600px"></div>
+      </div>
+    </div>
+    <h1 class="intro-text">SPIKY DASHER</h1>
+    <button id="start_btn">START GAME</button>
+    <p class="start-instructions">
+      Arrow keys to move and jump<br>
+      double jump / wall sliding
+    </p>
+  </div>
+  <div id="victory_screen" style="display: none;">
+    <div class="victory-content">
+      <h1 class="neon-title">MISSION COMPLETE</h1>
+      <div class="stats-container">
+        <div class="stat-box">
+          <h2>TIME</h2>
+          <p id="final_time">00:00:00</p>
+        </div>
+        <div class="stat-box">
+          <h2>DEATHS</h2>
+          <p id="final_deaths">0</p>
+        </div>
+      </div>
+      <button id="restart_btn">PLAY AGAIN</button>
+    </div>
+  </div>
+  <div id='game_console'>
+    <div id='deaths_counter'></div>
+    <div id='time_counter'></div>
+  </div>
+  <script src="script.js"></script>
+
+</body>
+</html>

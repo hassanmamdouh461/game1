@@ -1,0 +1,984 @@
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --root-clr: dimgray;
+  --tile-line-height: 30px;
+  --tile-size: 10px;
+  --clr: gray;
+  --pl-clr:
+    radial-gradient(circle at 75% 50%, white 1px, transparent 2px),
+    radial-gradient(circle at 25% 50%, white 1px, transparent 2px),
+    radial-gradient(circle at 75% 40%, black 3px, transparent 4px),
+    radial-gradient(circle at 25% 40%, black 3px, transparent 4px),
+    white;
+}
+
+html,
+body {
+  min-width: 100vw;
+  min-height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: #111;
+}
+
+#game_console {
+  width: 100%;
+  max-width: 1000px;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, .65), rgba(0, 0, 0, 1)),
+    var(--root-clr);
+  text-align: center;
+  line-height: var(--tile-line-height);
+  font-size: 0;
+  color: transparent;
+  user-select: none;
+  box-shadow:
+    0 20px 20px black;
+  /*   overflow: hidden; */
+}
+
+#deaths_counter,
+#time_counter {
+  padding: 0.4rem 0.75rem;
+  font-size: 13px;
+  font-family: system-ui, monospace;
+  line-height: 1.4;
+  color: white;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  position: absolute;
+  z-index: 99999;
+  text-align: center;
+  pointer-events: none;
+}
+
+#deaths_counter {
+  top: 10px;
+  left: 10px;
+}
+
+#time_counter {
+  top: 10px;
+  right: 10px;
+}
+
+
+
+h2 {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.tile {
+  /*   outline: 1px dashed rgba(0,0,0,.5); */
+}
+
+.ground {
+  background: var(--root-clr);
+  box-sizing: border-box;
+  border-top: 5px solid rgba(0, 0, 0, .25);
+  border-right: 5px solid rgba(0, 0, 0, .65);
+  border-bottom: 5px solid rgba(0, 0, 0, .65);
+  border-left: 5px solid rgba(0, 0, 0, .25);
+  outline: 0;
+  z-index: 2;
+  /*   filter: brightness(.75); */
+}
+
+.innerwall {
+  background: var(--root-clr);
+  outline: 0;
+}
+
+/* lava spikes */
+.lava {
+  background:
+    conic-gradient(at 50% 0%, transparent 0deg 153deg, rgba(0, 0, 0, .5) 155deg 190deg, rgba(255, 255, 255, .5) 192deg 205deg, transparent 207deg 360deg),
+    conic-gradient(at 50% 0%, transparent 0deg 153deg, var(--root-clr) 155deg 195deg, var(--root-clr) 197deg 205deg, transparent 207deg 360deg);
+}
+
+.spleft {
+  transform: rotate(-90deg);
+}
+
+.sptop {
+  transform: rotate(180deg);
+}
+
+.spright {
+  transform: rotate(90deg);
+}
+
+.portal1:after,
+.portal2:after {
+  content: '';
+  width: 150%;
+  height: 150%;
+  position: absolute;
+  top: -25%;
+  left: 0;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(0, 0, 0, 1) 3px,
+      rgba(0, 0, 0, .75) 6px,
+      rgba(0, 0, 0, .75) 10px,
+      rgba(0, 0, 0, .5) 11px,
+      rgba(0, 0, 0, .5) 15px,
+      rgba(0, 0, 0, .25) 16px,
+      rgba(0, 0, 0, .25) 20px),
+    var(--root-clr);
+  animation: portal 2s linear infinite;
+  /*   box-shadow: 
+  inset 3px 0 0 3px rgb(0 0 0 / 25%), 
+  3px 0px 0 2px rgb(255 255 255 / 50%); */
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+@keyframes portal {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.nextlevel {
+  /*   background:
+  linear-gradient(to bottom right, transparent 10%, var(--root-clr) 10% 30%, transparent 30% 60%, var(--root-clr) 60% 80%, transparent 80%);
+  background-size: 25px 25px; */
+}
+
+#player,
+#player:after {
+  content: '';
+  width: 25px;
+  height: 25px;
+  background: transparent;
+  position: absolute;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+#player:before {
+  content: '';
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background:
+    radial-gradient(circle at 85% 15%, LightSeaGreen 3px, transparent 4px),
+    radial-gradient(circle at 15% 15%, LightSeaGreen 3px, transparent 4px),
+    radial-gradient(circle at 65% 90%, LightSeaGreen 2px, transparent 3px),
+    radial-gradient(circle at 35% 90%, LightSeaGreen 2px, transparent 3px);
+}
+
+#player:after {
+  width: 20px;
+  height: 25px;
+  background:
+    linear-gradient(to top, LightSeaGreen 0%, transparent 0%),
+    radial-gradient(circle at 60% 40%, PaleTurquoise 2px, transparent 3px),
+    radial-gradient(circle at 50% 50%, black 5px, transparent 6px),
+    DarkTurquoise;
+  position: absolute;
+  top: -2.5px;
+  left: 2.5px;
+  z-index: 10000;
+  border-radius: 50% 60% 50% 50% / 70% 70% 40% 40%;
+  pointer-events: none;
+  box-shadow:
+    inset 2px 2px 3px 3px rgba(255, 255, 255, .5),
+    inset -2px -2px 3px 3px rgba(0, 0, 0, .33);
+  animation: blink 4s linear infinite;
+}
+
+@keyframes blink {
+  5% {
+    background:
+      linear-gradient(to bottom, LightSeaGreen 35%, transparent 35%),
+      radial-gradient(circle at 60% 40%, PaleTurquoise 2px, transparent 3px),
+      radial-gradient(circle at 50% 50%, black 5px, transparent 6px),
+      DarkTurquoise;
+  }
+
+  10% {
+    background:
+      linear-gradient(to bottom, LightSeaGreen 60%, transparent 60%),
+      radial-gradient(circle at 60% 40%, PaleTurquoise 2px, transparent 3px),
+      radial-gradient(circle at 50% 50%, black 5px, transparent 6px),
+      DarkTurquoise;
+  }
+
+  15% {
+    background:
+      linear-gradient(to bottom, LightSeaGreen 0%, transparent 0%),
+      radial-gradient(circle at 60% 40%, PaleTurquoise 2px, transparent 3px),
+      radial-gradient(circle at 50% 50%, black 5px, transparent 6px),
+      DarkTurquoise;
+  }
+}
+
+/* player 2 GLITCH CHARACTER */
+#player2 {
+  width: 25px;
+  height: 25px;
+  background: #000;
+  position: relative;
+  z-index: 10000;
+  pointer-events: none;
+  
+  /* Glitch border effect */
+  border: 2px solid cyan;
+  box-shadow: 
+    0 0 8px cyan,
+    0 0 20px cyan,
+    inset 0 0 8px rgba(0, 255, 255, 0.5);
+    
+  animation: color-shift 3s infinite;
+}
+
+/* Subtle Scan Lines Overlay */
+#player2:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 255, 0.05) 0px,
+    transparent 1px,
+    transparent 3px,
+    rgba(0, 255, 255, 0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Simple Static Face */
+#player2:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  
+  /* Simple calm eyes and mouth */
+  background: 
+    radial-gradient(circle, #fff 50%, transparent 55%) 28% 35% / 5px 5px no-repeat,
+    radial-gradient(circle, #fff 50%, transparent 55%) 72% 35% / 5px 5px no-repeat,
+    linear-gradient(90deg, #fff, #fff) 50% 68% / 35% 2px no-repeat;
+  
+  opacity: 0.75;
+}
+
+/* Glitch Movement Animation */
+@keyframes glitch-pulse {
+  0%, 90% { 
+    transform: translate(0, 0); 
+  }
+  91% { 
+    transform: translate(-2px, 0); 
+    box-shadow: 2px 0 8px magenta, -2px 0 8px cyan;
+  }
+  92% { 
+    transform: translate(2px, 0); 
+    box-shadow: -2px 0 8px yellow, 2px 0 8px cyan;
+  }
+  93% { 
+    transform: translate(0, 0); 
+  }
+  94% {
+    transform: translate(1px, -1px);
+  }
+  95% {
+    transform: translate(-1px, 1px);
+  }
+  100% { 
+    transform: translate(0, 0); 
+  }
+}
+
+/* Color Shift Animation */
+@keyframes color-shift {
+  0%, 33% { 
+    border-color: cyan;
+    filter: hue-rotate(0deg);
+  }
+  34%, 66% { 
+    border-color: magenta;
+    filter: hue-rotate(90deg);
+  }
+  67%, 100% { 
+    border-color: yellow;
+    filter: hue-rotate(180deg);
+  }
+}
+
+/* Face Changes Animation - removed, face is now static */
+
+/* Scan Lines Movement */
+@keyframes scan-lines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(3px); }
+}
+
+.goleft:after {
+  transform: skewX(10deg);
+}
+
+.goright:after {
+  transform: skewX(-10deg);
+}
+
+.goleft:before,
+.goright:before {}
+
+.trailBall {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: cyan;
+  border-radius: 50%;
+  opacity: .75;
+  pointer-events: none;
+  opacity: 1;
+  animation: trail .75s linear forwards;
+}
+
+@keyframes trail {
+  100% {
+    transform: translateY(-25px);
+    opacity: 0;
+  }
+}
+
+/* Intro Screen Styles */
+#loading_screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  transition: opacity 1s;
+  overflow: hidden;
+}
+
+.intro-scene {
+  position: relative;
+  width: 300px;
+  height: 150px;
+  border-bottom: 2px solid cyan;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.intro-player {
+  /* Copying basic player 2 styles */
+  width: 25px;
+  height: 25px;
+  background: #000;
+  position: absolute;
+  bottom: 0;
+  left: 50px;
+  border: 2px solid cyan;
+  box-shadow: 0 0 5px cyan, inset 0 0 5px cyan;
+  /* Face */
+  background-image: 
+    linear-gradient(90deg, #fff, #fff),
+    linear-gradient(90deg, #fff, #fff),
+    linear-gradient(90deg, #fff, #fff);
+  background-position: 20% 35%, 80% 35%, 50% 75%;
+  background-size: 25% 3px, 25% 3px, 60% 3px;
+  background-repeat: no-repeat;
+  
+  animation: intro-jump 1.5s infinite linear;
+}
+
+.intro-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.intro-obstacle {
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 30px;
+  background: red;
+  /* Triangle shape for spike */
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  box-shadow: 0 0 10px red; 
+  left: 300px; /* Start off screen */
+  animation: intro-scroll 1.5s infinite linear;
+}
+
+.intro-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2rem;
+  color: white;
+  text-shadow: 0 0 10px cyan;
+  animation: blink-text 1s infinite;
+}
+
+@keyframes intro-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-300px); }
+}
+
+@keyframes intro-jump {
+  0%, 60% { bottom: 0; transform: rotate(0deg); }
+  70% { bottom: 50px; transform: rotate(90deg); } /* Jump Up */
+  80% { bottom: 50px; transform: rotate(180deg); } /* Hover/Turn */
+  90% { bottom: 0; transform: rotate(360deg); } /* Land */
+  100% { bottom: 0; transform: rotate(360deg); }
+}
+
+#start_btn {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2rem;
+  background: transparent;
+  color: cyan;
+  border: 4px solid cyan;
+  padding: 10px 30px;
+  margin-top: 30px;
+  cursor: pointer;
+  box-shadow: 0 0 10px cyan, inset 0 0 10px cyan;
+  text-shadow: 0 0 5px cyan;
+  transition: 0.3s;
+  opacity: 0;
+  animation: fade-in-btn 1s forwards 2s;
+}
+
+#start_btn:hover {
+  background: cyan;
+  color: black;
+  box-shadow: 0 0 20px cyan, inset 0 0 20px cyan;
+}
+
+@keyframes fade-in-btn {
+  to { opacity: 1; }
+}
+
+.start-instructions {
+  color: #aaa;
+  font-family: system-ui, sans-serif;
+  margin-top: 20px;
+  text-align: center;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fade-in-btn 1s forwards 2.5s;
+}
+
+/* Particle Effects */
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: cyan;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 20000;
+}
+
+/* Screen Shake Animation */
+.shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* Victory Screen */
+#victory_screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 10, 15, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 200000;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  backdrop-filter: blur(5px);
+}
+
+.victory-content {
+  border: 4px solid cyan;
+  padding: 40px 60px;
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 30px cyan, inset 0 0 30px cyan;
+  border-radius: 20px;
+  transform: scale(0.8);
+  opacity: 0;
+  animation: popup-victory 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popup-victory {
+  to { transform: scale(1); opacity: 1; }
+}
+
+.neon-title {
+  font-size: 3.5rem;
+  color: #fff;
+  text-shadow: 
+    0 0 5px #fff,
+    0 0 10px #fff,
+    0 0 20px cyan,
+    0 0 40px cyan,
+    0 0 80px cyan;
+  margin-bottom: 30px;
+  letter-spacing: 5px;
+}
+
+.stats-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.stat-box {
+  background: linear-gradient(45deg, rgba(0,255,255,0.1), transparent);
+  padding: 15px 30px;
+  border-left: 3px solid cyan;
+  border-right: 3px solid cyan;
+}
+
+.stat-box h2 {
+  font-size: 1.2rem;
+  color: #aaa;
+  margin: 0 0 10px 0;
+}
+
+.stat-box p {
+  font-size: 2rem;
+  margin: 0;
+  color: white;
+  font-weight: bold;
+}
+
+#restart_btn {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.5rem;
+  background: transparent;
+  color: cyan;
+  border: 2px solid cyan;
+  padding: 15px 40px;
+  margin-top: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+#restart_btn:hover {
+  background: cyan;
+  color: black;
+  box-shadow: 0 0 30px cyan;
+}
+
+/* Player Jump Animation */
+.jumping {
+  /* Spin faster and continuously */
+  animation: player-spin 0.4s linear infinite !important;
+}
+
+@keyframes player-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hide game console initially */
+#game_console {
+  opacity: 0;
+  transition: opacity 1s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Level Transition Flash */
+.level-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  pointer-events: none;
+  z-index: 50000;
+  animation: flash 0.6s ease-out forwards;
+}
+
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* Wall Slide Particles */
+.wall-spark {
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(180deg, orange, transparent);
+  pointer-events: none;
+  z-index: 15000;
+  animation: spark-fall 0.5s ease-out forwards;
+}
+
+@keyframes spark-fall {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(30px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Warp Particles for Next Level Gate */
+.warp-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: cyan;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 20000;
+  box-shadow: 0 0 10px cyan;
+  animation: warp-spiral 0.8s ease-out forwards;
+}
+
+@keyframes warp-spiral {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--warp-x) * 0.5), calc(var(--warp-y) * 0.5)) scale(1.5) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--warp-x), var(--warp-y)) scale(0.2) rotate(360deg);
+    opacity: 0;
+  }
+}
+/* ------- Osmo Intro Animation Styles ------- */
+body.intro-mode {
+  background-color: #f4f4f4 !important;
+  font-family: 'PP Neue Montreal', Arial, sans-serif;
+  color: #201d1d;
+  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b239d7aeb290a31ac5_cursor-default%402x.svg") 2 0, auto;
+}
+
+body.intro-mode a,
+body.intro-mode button {
+  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b212e6b71494aa67ff_cursor-pointer%402x.svg") 12 0, pointer;
+}
+
+/* Disable Scroll on Loading */
+main:has(.willem-header.is--loading) {
+  height: 100dvh;
+}
+
+.willem-header {
+  color: #f4f4f4;
+  position: fixed; /* Changed to fixed to cover everything */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 200000; /* Higher than game z-index */
+  background-color: #f4f4f4; /* Match body bg */
+  overflow: hidden;
+}
+
+/* Loading: Hidden */
+.willem-header.is--loading.is--hidden {
+  display: none;
+}
+
+.willem-loader {
+  color: #201d1d;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.willem__h1 {
+  font-family: 'Courier New', Courier, monospace;
+  white-space: nowrap;
+  justify-content: center;
+  font-size: 12.5em;
+  font-weight: 500;
+  line-height: .75;
+  display: flex;
+  position: relative;
+}
+
+
+/* Keep Main Text Visible */
+.willem__h1-start {
+  justify-content: flex-end;
+  width: 3.5em; /* Keep width for longer text */
+  display: flex; 
+  overflow: hidden;
+}
+
+.willem__h1-end {
+  justify-content: flex-start;
+  width: 3.5em;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Hide Secondary Text (Header links & Footer credits) */
+.willem-header__top,
+.willem-header__bottom .osmo-credits__p,
+.willem-header__bottom .willem__h1, /* This hides the bottom large text */
+.willem-nav__link {
+  display: none !important;
+}
+
+.willem__letter {
+  display: block;
+  position: relative;
+}
+
+.willem__letter-white.is--space {
+  margin-left: .25em;
+}
+
+.willem-loader__box {
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: 0;
+  display: flex;
+  position: relative;
+}
+
+.willem-loader__box-inner {
+  justify-content: center;
+  align-items: center;
+  min-width: 1em;
+  height: 95%;
+  display: flex;
+  position: relative;
+}
+
+.willem__growing-image {
+  justify-content: center;
+  align-items: center;
+  width: 0%;
+  height: 100%;
+  display: flex;
+  position: absolute;
+  overflow: hidden;
+}
+
+.willem__growing-image-wrap {
+  width: 100%;
+  min-width: 1em;
+  height: 100%;
+  position: absolute;
+}
+
+.willem__cover-image {
+  pointer-events: none;
+  object-fit: cover;
+  -webkit-user-select: none;
+  user-select: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.willem__cover-image-extra {
+  pointer-events: none;
+  object-fit: cover;
+  -webkit-user-select: none;
+  user-select: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.willem__cover-image-extra.is--1 {
+  z-index: 3;
+}
+
+.willem__cover-image-extra.is--2 {
+  z-index: 2;
+}
+
+.willem__cover-image-extra.is--3 {
+  z-index: 1;
+}
+
+.willem-header__content {
+  flex-flow: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 100dvh;
+  padding: 3em;
+  display: flex;
+  position: relative;
+}
+
+.willem-header__top {
+  width: 100%;
+  position: relative;
+}
+
+.willem-header__bottom {
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.willen-nav {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.willem-nav__start {
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 50%;
+  display: flex;
+}
+
+.willem-nav__end {
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 50%;
+  display: flex;
+}
+
+.willem-nav__cta {
+  display: flex;
+}
+
+.willem-nav__links {
+  grid-column-gap: .5em;
+  grid-row-gap: .5em;
+  display: flex;
+}
+
+.willem-nav__link {
+  color: inherit;
+  font-size: 1.3125em;
+  line-height: 1.3;
+  text-decoration: none;
+  position: relative;
+}
+
+.willem__letter-white {
+  display: block;
+  position: relative;
+}
+
+@media screen and (max-width: 991px) {
+  .willem__h1 {
+    font-size: 9em;
+  }
+
+  .willem-nav__links {
+    grid-column-gap: 0em;
+    grid-row-gap: 0em;
+    flex-flow: column;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .willem__h1 {
+    font-size: 5.5em;
+  }
+
+  .willem-nav__start {
+    width: 65%;
+  }
+
+  .willem-nav__end {
+    grid-column-gap: 1.5em;
+    grid-row-gap: 1.5em;
+    flex-flow: column;
+    width: 45%;
+  }
+}
+
+.osmo-credits__p {
+  pointer-events: auto;
+  text-align: center;
+  margin: 0;
+  font-family: PP Neue Montreal, Arial, sans-serif;
+  font-size: 1.125em;
+  font-weight: 500;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.osmo-credits__p-a {
+  color: #f4f4f4;
+}
+
+@media screen and (max-width: 991px) {
+  .osmo-credits__p {
+    display: none;
+  }
+}
+
+
