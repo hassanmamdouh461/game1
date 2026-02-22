@@ -49,10 +49,11 @@ function createPortalWarp(x, y) {
 }
 
 function secondsToTime(e) {
-  var totalSeconds = Math.floor(e / 45); // Convert frames (45fps) to seconds
-  var m = Math.floor(totalSeconds / 60).toString().padStart(2, '0'),
-    s = (totalSeconds % 60).toString().padStart(2, '0');
-  return m + ':' + s;
+  var totalSec = e / 45;
+  var m  = Math.floor(totalSec / 60).toString().padStart(2, '0');
+  var s  = Math.floor(totalSec % 60).toString().padStart(2, '0');
+  var cs = Math.floor((totalSec % 1) * 100).toString().padStart(2, '0');
+  return m + ':' + s + ':' + cs;
 }
 
 function createExplosion(x, y, color = 'cyan') {
@@ -183,20 +184,12 @@ gc.style.width = '1000px'
 gc.style.height = tile_size * rows + 'px'
 
 var gravity = 8,
-  kd,
   x_speed = 5,
-  pb_y = 0,
-  score = 0,
-  rot = 0,
-  data_p = 0,
-  bonus = 1,
   dead = false,
-  kd_list = [],
   keys = {},
-  gp,
-  gpa,
   dbljump = false,
   dash = false,
+  paused = false,
   transitioning = false,
   timer = 0,
   deaths = 0,
@@ -434,6 +427,7 @@ function buildGame(shouldStart = true) {
   var x = pl_loc.left
 
   function updatePlayer() {
+    if (paused) return;
     // get points based on player location
     var pl_loc = pl.getBoundingClientRect()
     var pl_center = document.elementFromPoint(pl_loc.x + (tile_size * .5), pl_loc.y + (tile_size * .75))
@@ -486,7 +480,7 @@ function buildGame(shouldStart = true) {
       var gp = gamepads[0];
 
       // add jump-force (change the gravity)
-      if ((keys[38]
+      if (((keys[38] || keys[32])
         || (gp && (gp.buttons[0].pressed
           || gp.buttons[1].pressed
           || gp.buttons[2].pressed
@@ -497,7 +491,7 @@ function buildGame(shouldStart = true) {
         pl.classList.add('jumping'); // Start spinning
         sfx.jump(); // Sound effect
       }
-      if ((keys[38]
+      if (((keys[38] || keys[32])
         || (gp && (gp.buttons[0].pressed
           || gp.buttons[1].pressed
           || gp.buttons[2].pressed
@@ -610,7 +604,7 @@ function buildGame(shouldStart = true) {
       tc.innerHTML = 'TIME<br>' + secondsToTime(timer)
 
       playerTrail()
-      setTimeout(updatePlayer, 1000 / 45) // update player 30-60 times a second
+      if (!paused) setTimeout(updatePlayer, 1000 / 45)
     }
   }
 
@@ -657,6 +651,17 @@ function buildGame(shouldStart = true) {
   if (!window._keyListenersAdded) {
     window._keyListenersAdded = true;
     window.addEventListener('keydown', function (e) {
+      if (e.code === 'KeyP' || e.code === 'Escape') {
+        togglePause();
+        return;
+      }
+      if (paused && e.code === 'KeyR') {
+        location.reload();
+        return;
+      }
+      if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+      }
       keys[e.which] = true;
     });
     window.addEventListener('keyup', function (e) {
@@ -793,6 +798,7 @@ window.addEventListener('load', function() {
                  
                  // Optional: Play start sound
                  if(sfx && sfx.start) sfx.start();
+                 startBackgroundMusic();
              }
          });
      } else {
@@ -807,6 +813,7 @@ window.addEventListener('load', function() {
       startBtn.addEventListener('click', function() {
         if (loadingScreen.style.opacity === '0') return; // Prevent double clicks
         sfx.start(); // Sound effect
+        startBackgroundMusic();
         startBtn.style.transform = 'scale(0.9)'; // Click effect
         
         // Fade out intro
@@ -852,9 +859,68 @@ function showVictory() {
     document.getElementById('final_deaths').innerText = deaths;
     
     if (typeof sfx !== 'undefined' && sfx.win) sfx.win();
+    stopBackgroundMusic();
     
     // Stop game loop
     window.startGameLoop = null; 
 }
+
+// ============================================
+// PAUSE SYSTEM
+// ============================================
+function togglePause() {
+  if (!window.startGameLoop && !paused) return;
+  paused = !paused;
+  const pauseScreen = document.getElementById('pause_screen');
+  if (pauseScreen) pauseScreen.style.display = paused ? 'flex' : 'none';
+  if (!paused && window.startGameLoop) {
+    window.startGameLoop();
+  }
+}
+
+// ============================================
+// BACKGROUND MUSIC (Web Audio API)
+// ============================================
+let bgMusicPlaying = false;
+let bgMusicTimeout = null;
+
+function startBackgroundMusic() {
+  if (bgMusicPlaying) return;
+  if (aCtx.state === 'suspended') aCtx.resume();
+  bgMusicPlaying = true;
+  const melody = [110, 146.8, 164.8, 130.8, 110, 123.5, 110, 146.8];
+  let noteIdx = 0;
+  function playBeat() {
+    if (!bgMusicPlaying) return;
+    const osc  = aCtx.createOscillator();
+    const gain = aCtx.createGain();
+    osc.connect(gain);
+    gain.connect(aCtx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(melody[noteIdx % melody.length], aCtx.currentTime);
+    gain.gain.setValueAtTime(0.04, aCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + 0.38);
+    osc.start();
+    osc.stop(aCtx.currentTime + 0.4);
+    noteIdx++;
+    bgMusicTimeout = setTimeout(playBeat, 420);
+  }
+  playBeat();
+}
+
+function stopBackgroundMusic() {
+  bgMusicPlaying = false;
+  if (bgMusicTimeout) { clearTimeout(bgMusicTimeout); bgMusicTimeout = null; }
+}
+
+// ============================================
+// RESPONSIVE — update CSS scale on resize
+// ============================================
+function updateGameScale() {
+  const scale = Math.min(1, (window.innerWidth - 20) / 1020);
+  document.documentElement.style.setProperty('--game-scale', scale.toFixed(4));
+}
+window.addEventListener('resize', updateGameScale);
+updateGameScale();
 
 window.focus()
