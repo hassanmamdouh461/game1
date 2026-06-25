@@ -1,7 +1,13 @@
 const gc = document.querySelector('#game_console')
-const gc_loc = gc.getBoundingClientRect()
+var gc_loc = gc.getBoundingClientRect()
 const player = 'player2'
 var pl;
+
+// Always return a fresh bounding rect for the game console
+function getGcLoc() {
+  gc_loc = gc.getBoundingClientRect();
+  return gc_loc;
+}
 
 // Visual Effects
 function screenShake() {
@@ -176,11 +182,12 @@ const sfx = {
 
 var cols = 40 // multiple of 16
 var rows = 22 // multiple of 9
-const tile_size = gc_loc.width * (100 / cols / 100)
+const GAME_WIDTH = 1000 // fixed internal game width in px
+const tile_size = GAME_WIDTH / cols
 const pl_size = tile_size * 2
 document.body.style.setProperty('--tile-line-height', pl_size + 'px')
 
-gc.style.width = '1000px'
+gc.style.width = GAME_WIDTH + 'px'
 gc.style.height = tile_size * rows + 'px'
 
 var gravity = 8,
@@ -193,7 +200,8 @@ var gravity = 8,
   transitioning = false,
   timer = 0,
   deaths = 0,
-  level_num = -1;
+  level_num = -1,
+  activeLoopId = 0;
 
 const levels = [
   {
@@ -247,30 +255,31 @@ const levels = [
       8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8]
   },
   {
-    start: '2,13',
-    map: [8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      8, 0, 0, 0, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 8, 8, 0, 0, 0, 0, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 0, 0, 0, 1, 1, 1, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1, 1, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      8, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8, 8, 8, 8, 8, 8,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 8, 8, 8, 8, 8,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 8, 8, 8, 8, 8,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 8, 8, 8,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 8, 8,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 8, 8, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1, 1, 0, 8, 8, 8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 8,
-      0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 8, 0, 2, 2, 2, 2, 2, 0, 8, 8, 8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
-      8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      8, 8, 8, 8, 0, 2, 2, 2, 2, 2, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-      8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
+    start: '4,7',
+    map: [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 7, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 0, 0, 0, 0, 0, 1, 1, 10, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 0, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 0, 0, 0, 10, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 10, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 0, 4, 4, 10, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 4, 1, 1, 10, 4, 4, 4, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 0, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 6, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      0, 0, 1, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      0, 0, 1, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      0, 0, 1, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 1, 1, 1, 0, 1, 1, 1, 11, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0
+    ]
   },
   {
     start: '1,2',
@@ -348,10 +357,39 @@ const levels = [
       8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
       8, 8, 8, 8, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
       8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  },
+  {
+    start: '2,13',
+    map: [8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      8, 0, 0, 0, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 8, 8, 0, 0, 0, 0, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 0, 0, 0, 1, 1, 1, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1, 1, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      8, 0, 1, 1, 0, 8, 8, 8, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      8, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
+      8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8, 8, 8, 8, 8, 8,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 8, 8, 8, 8, 8,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 8, 8, 8, 8, 8,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 8, 8, 8,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 8,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 8, 8,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 8, 8, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1, 1, 0, 8, 8, 8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 8,
+      0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 8, 0, 2, 2, 2, 2, 2, 0, 8, 8, 8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+      8, 8, 8, 8, 0, 1, 1, 1, 1, 1, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      8, 8, 8, 8, 0, 2, 2, 2, 2, 2, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+      8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
   }
 ]
 
 function buildGame(shouldStart = true) {
+  activeLoopId++;
+  const localLoopId = activeLoopId;
+  let loopRunning = false;
   // clear tiles and update level number
   gc.innerHTML = "<div id='" + player + "'></div><div id='deaths_counter'></div><div id='time_counter'></div>"
   if (level_num < levels.length - 1) {
@@ -406,6 +444,12 @@ function buildGame(shouldStart = true) {
     if (levels[level_num].map[i] == 9) {
       tile.className = 'tile nextlevel'
     }
+    if (levels[level_num].map[i] == 10) {
+      tile.className = 'tile laser'
+    }
+    if (levels[level_num].map[i] == 11) {
+      tile.className = 'tile laser-node'
+    }
     tile.setAttribute('grid_loc', [i % cols, Math.floor(i / cols)])
     tile.style.width = tile_size + 'px'
     tile.style.height = tile_size + 'px'
@@ -423,228 +467,229 @@ function buildGame(shouldStart = true) {
   pl.style.top = (tile_size * levels[level_num].start.split(',')[1]) + 'px'
   pl.style.left = (tile_size * levels[level_num].start.split(',')[0]) + 'px'
 
-  var pl_loc = pl.getBoundingClientRect()
-  var x = pl_loc.left
+  var px = tile_size * parseFloat(levels[level_num].start.split(',')[0]);
+  var py = tile_size * parseFloat(levels[level_num].start.split(',')[1]);
+
+  function getTileType(x, y) {
+    if (x < 0 || x >= GAME_WIDTH || y < 0) return 1; // 1 is empty space
+    var col = Math.floor(x / tile_size);
+    var row = Math.floor(y / tile_size);
+    if (row >= rows) return 1;
+    var index = row * cols + col;
+    return levels[level_num].map[index];
+  }
+
+  function tileAt(x, y, className) {
+    var t = getTileType(x, y);
+    if (className === 'ground') return t === 0;
+    if (className === 'lava') return (t >= 2 && t <= 5) || t === 10 || t === 11;
+    if (className === 'portal1') return t === 6;
+    if (className === 'nextlevel') return t === 9;
+    return false;
+  }
 
   function updatePlayer() {
-    if (paused) return;
-    // get points based on player location
-    var pl_loc = pl.getBoundingClientRect()
-    var pl_center = document.elementFromPoint(pl_loc.x + (tile_size * .5), pl_loc.y + (tile_size * .75))
-    var pl_xy1 = document.elementFromPoint(pl_loc.x + (pl_loc.width * .25), pl_loc.y + pl_loc.height + gravity)
-    var pl_xy2 = document.elementFromPoint(pl_loc.x + (pl_loc.width * .75), pl_loc.y + pl_loc.height + gravity)
-    var pl_xy3 = document.elementFromPoint(pl_loc.x - (x_speed * .5), pl_loc.y + (pl_loc.height * .5))
-    var pl_xy4 = document.elementFromPoint(pl_loc.x + pl_loc.width + (x_speed * .5), pl_loc.y + (pl_loc.height * .5))
-    var pl_xy5 = document.elementFromPoint(pl_loc.x + (pl_loc.width * .5), pl_loc.y - (gravity * .5))
-    var pl_xy6 = document.elementFromPoint(pl_loc.x + (pl_size * .5), pl_loc.y + pl_size)
-
-    // console.log(pl_center)
-
-    function endGame() {
-      alert('you died')
+    if (localLoopId !== activeLoopId) {
+      loopRunning = false;
+      return;
     }
+    if (paused) {
+      loopRunning = false;
+      return;
+    }
+    loopRunning = true;
 
-    //if dead stop, else update player and everything else
-    if (!pl_xy1 || !pl_xy2 || dead) {
-      // endGame()
+    var cx = px + tile_size * 0.5;
+    var cy = py + tile_size * 0.75;
+    var x1 = px + tile_size * 0.25;
+    var y12 = py + tile_size + (gravity > 0 ? gravity : 0);
+    var x2 = px + tile_size * 0.75;
+    var x3 = px - x_speed * 0.5;
+    var y34 = py + tile_size * 0.5;
+    var x4 = px + tile_size + x_speed * 0.5;
+    var x5 = px + tile_size * 0.5;
+    var y5 = py + (gravity < 0 ? gravity : 0);
+
+    var is_center_lava = tileAt(cx, cy, 'lava');
+    var is_center_portal1 = tileAt(cx, cy, 'portal1');
+    var is_center_nextlevel = tileAt(cx, cy, 'nextlevel');
+    
+    var is_xy1_ground = tileAt(x1, y12, 'ground') && gravity >= 0;
+    var is_xy2_ground = tileAt(x2, y12, 'ground') && gravity >= 0;
+    var is_xy3_ground = tileAt(x3, y34, 'ground');
+    var is_xy4_ground = tileAt(x4, y34, 'ground');
+    var is_xy5_ground = tileAt(x5, y5, 'ground');
+
+    if (dead) {
+      // do nothing
     } else {
-
-      // set player top   
-      // if player on ground set new top
-      if (pl_xy1.classList.contains('ground') ||
-        pl_xy2.classList.contains('ground')) {
-        // Better landing check: if we were previously in air (gravity > 0)
-        if (gravity > 3) {
-          sfx.land();
-        }
-        
-        gravity = 0
+      if (is_xy1_ground || is_xy2_ground) {
+        if (gravity > 3) sfx.land();
+        py = Math.floor(y12 / tile_size) * tile_size - tile_size;
+        gravity = 0;
         if (pl.classList.contains('jumping')) {
            pl.classList.remove('jumping');
-           pl.style.transform = 'rotate(0deg)'; // Snap to flat on landing
+           pl.style.transform = 'rotate(0deg)'; 
         }
       } else {
-        if (gravity < 8) {
-          gravity += .51
-        } else {
-          gravity = 8
-        }
+        if (gravity < 8) gravity += .51;
+        else gravity = 8;
       }
-      pl.style.top = pl_loc.top - 6.25 - gc_loc.top + gravity + 'px'
-      // console.log(gravity)    
-
+      py += gravity;
+      
       var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-      if (!gamepads) {
-        return;
-      }
+      if (!gamepads) return;
       var gp = gamepads[0];
 
-      // add jump-force (change the gravity)
-      if (((keys[38] || keys[32])
-        || (gp && (gp.buttons[0].pressed
-          || gp.buttons[1].pressed
-          || gp.buttons[2].pressed
-          || gp.buttons[3].pressed)))
-        && gravity == 0) {
-        dbljump = false
-        gravity = -9
-        pl.classList.add('jumping'); // Start spinning
-        sfx.jump(); // Sound effect
+      if (((keys[38] || keys[32]) || (gp && (gp.buttons[0].pressed || gp.buttons[1].pressed || gp.buttons[2].pressed || gp.buttons[3].pressed))) && gravity == 0) {
+        dbljump = false;
+        gravity = -9;
+        pl.classList.add('jumping');
+        sfx.jump();
       }
-      if (((keys[38] || keys[32])
-        || (gp && (gp.buttons[0].pressed
-          || gp.buttons[1].pressed
-          || gp.buttons[2].pressed
-          || gp.buttons[3].pressed)))
-        && gravity > 0) {
+      if (((keys[38] || keys[32]) || (gp && (gp.buttons[0].pressed || gp.buttons[1].pressed || gp.buttons[2].pressed || gp.buttons[3].pressed))) && gravity > 0) {
         if (!dbljump) {
-          gravity = -9
-          pl.classList.add('jumping'); // Start spinning on double jump
-          sfx.jump(); // Sound effect
+          gravity = -9;
+          pl.classList.add('jumping');
+          sfx.jump();
         }
-        dbljump = true
+        dbljump = true;
       }
 
+      var gpa = 0;
       if (gp) {
-        var gpa = Math.round(gp.axes[0])
+        gpa = Math.round(gp.axes[0]);
         if (gpa == 0 || gravity == 0) {
-          pl.className = ''
-          pl.style.transform = 'rotate(0deg)'
+          pl.className = '';
+          pl.style.transform = 'rotate(0deg)';
         }
       }
 
-      // track left/right movement
-      if ((keys[37] || (gp && gpa == -1)) && x > gc_loc.x) {
-        if (!pl_xy3.classList.contains('ground')) {
-          x -= x_speed
-          // Only add goleft if NOT jumping (jumping overrides rotation)
+      if ((keys[37] || (gp && gpa == -1)) && px > 0) {
+        if (!is_xy3_ground) {
+          px -= x_speed;
           if (!pl.classList.contains('jumping')) {
-             pl.className = ''
-             pl.classList.add('goleft')
+             pl.className = '';
+             pl.classList.add('goleft');
           }
         } else {
+          px = Math.floor(x3 / tile_size) * tile_size + tile_size;
           if (gravity > 0) {
-            dbljump = false
-            gravity = 1
-            pl.style.transform = 'rotate(90deg)'
-            // Wall slide sparks
-            createWallSparks(pl_loc.left - gc_loc.left, pl_loc.top - gc_loc.top, 'left');
+            dbljump = false;
+            gravity = 1;
+            pl.style.transform = 'rotate(90deg)';
+            createWallSparks(px, py, 'left');
           }
-          pl.className = ''
+          pl.className = '';
         }
       }
 
-      // console.log(x_speed)
-      if ((keys[39] || (gp && gpa == 1)) && x + pl_loc.width < gc_loc.x + gc_loc.width) {
-        if (!pl_xy4.classList.contains('ground')) {
-          x += x_speed
-          // Only add goright if NOT jumping
-             if (!pl.classList.contains('jumping')) {
-                pl.className = ''
-                pl.classList.add('goright')
-             }
-        } else {
-          if (gravity > 0) {
-            dbljump = false
-            gravity = 1
-            pl.style.transform = 'rotate(-90deg)'
-            // Wall slide sparks
-            createWallSparks(pl_loc.left - gc_loc.left, pl_loc.top - gc_loc.top, 'right');
+      if ((keys[39] || (gp && gpa == 1)) && px + tile_size < GAME_WIDTH) {
+        if (!is_xy4_ground) {
+          px += x_speed;
+          if (!pl.classList.contains('jumping')) {
+             pl.className = '';
+             pl.classList.add('goright');
           }
-          pl.className = ''
+        } else {
+          px = Math.floor(x4 / tile_size) * tile_size - tile_size;
+          if (gravity > 0) {
+            dbljump = false;
+            gravity = 1;
+            pl.style.transform = 'rotate(-90deg)';
+            createWallSparks(px, py, 'right');
+          }
+          pl.className = '';
         }
       }
 
-      pl.style.left = x - gc_loc.left + 'px'
-      // pl.style.left = x + x_speed - gc_loc.left + 'px'
-
-      // set different interactions based on tile type
-      if (pl_xy5.classList.contains('ground')) {
-        gravity = 8
+      if (is_xy5_ground) {
+        py = Math.floor(y5 / tile_size) * tile_size + tile_size;
+        gravity = 8;
       }
 
-      if (pl_center.classList.contains('lava')) {
-        sfx.die(); // Death sound
-        
-        // Visual Effects
-        let pl_rect = pl.getBoundingClientRect();
-        createExplosion(pl_rect.left - gc_loc.left + 12.5, pl_rect.top - gc_loc.top + 12.5);
+      if (px < 0) px = 0;
+      if (px + tile_size > GAME_WIDTH) px = GAME_WIDTH - tile_size;
+      pl.style.left = px + 'px';
+
+      var maxTop = (tile_size * rows) - tile_size;
+      if (py < 0) py = 0;
+      if (py > maxTop) py = maxTop;
+      pl.style.top = py + 'px';
+
+      if (is_center_lava) {
+        sfx.die();
+        createExplosion(px + tile_size/2, py + tile_size/2);
         screenShake();
-
-        // console.log('lava')
-        pl.style.top = (tile_size * levels[level_num].start.split(',')[1]) + 'px'
-        pl.style.left = (tile_size * levels[level_num].start.split(',')[0]) + 'px'
-        pl_loc = pl.getBoundingClientRect()
-        x = pl_loc.left
-        deaths++
-        dc.innerHTML = 'DEATHS<br>' + deaths
+        px = tile_size * parseFloat(levels[level_num].start.split(',')[0]);
+        py = tile_size * parseFloat(levels[level_num].start.split(',')[1]);
+        pl.style.top = py + 'px';
+        pl.style.left = px + 'px';
+        deaths++;
+        dc.innerHTML = 'DEATHS<br>' + deaths;
       }
 
-      if (pl_center.classList.contains('portal1')) {
-        let p2 = document.querySelector('.portal2')
-        let p2_loc = p2.getBoundingClientRect()
-        pl.style.top = p2_loc.top - gc_loc.top + 'px'
-        pl.style.left = p2_loc.left - gc_loc.left + 'px'
-        pl_loc = pl.getBoundingClientRect()
-        x = pl_loc.left
+      if (is_center_portal1) {
+        let p2 = document.querySelector('.portal2');
+        if (p2) {
+          px = parseFloat(p2.style.left);
+          py = parseFloat(p2.style.top);
+          pl.style.top = py + 'px';
+          pl.style.left = px + 'px';
+        }
       }
 
-      if (pl_center.classList.contains('nextlevel') && !transitioning) {
+      if (is_center_nextlevel && !transitioning) {
         transitioning = true;
-        sfx.win(); // Win sound
-        // Portal warp effect
-        createPortalWarp(pl_loc.left - gc_loc.left + 12.5, pl_loc.top - gc_loc.top + 12.5);
+        sfx.win();
+        createPortalWarp(px + tile_size/2, py + tile_size/2);
         setTimeout(() => {
           transitioning = false;
           buildGame();
         }, 400);
       }
 
-      timer++
-      tc.innerHTML = 'TIME<br>' + secondsToTime(timer)
+      timer++;
+      tc.innerHTML = 'TIME<br>' + secondsToTime(timer);
 
-      playerTrail()
-      if (!paused) setTimeout(updatePlayer, 1000 / 45)
+      playerTrail();
+      if (!paused) setTimeout(updatePlayer, 1000 / 45);
     }
   }
 
-  // Expose the loop function so we can start it externally
-  window.startGameLoop = updatePlayer;
-
-  // Only start the loop if allowed (default is true)
-  if (shouldStart !== false) {
-    updatePlayer()
+  function startGameLoopWrapper() {
+    if (localLoopId !== activeLoopId) return;
+    if (!loopRunning) {
+      loopRunning = true;
+      updatePlayer();
+    }
   }
 
-  // add trail behind player b/c it's fun
+  window.startGameLoop = startGameLoopWrapper;
+
+  if (shouldStart !== false) {
+    startGameLoopWrapper();
+  }
+
   function playerTrail() {
     if (player == 'player') {
-      let x = pl.getBoundingClientRect().x
-      let y = pl.getBoundingClientRect().y
-      let b = document.createElement('div')
-      b.className = 'trailBall'
-      b.style.left = x + 11 - gc_loc.left + 'px'
-      b.style.top = y + 5 - gc_loc.top + 'px'
-      b.onanimationend = function () {
-        b.remove()
-      }
-      gc.appendChild(b)
+      let b = document.createElement('div');
+      b.className = 'trailBall';
+      b.style.left = px + 11 + 'px';
+      b.style.top = py + 5 + 'px';
+      b.onanimationend = function () { b.remove(); };
+      gc.appendChild(b);
     }
 
     if (player == 'player2') {
-      let x = pl.getBoundingClientRect().x
-      let y = pl.getBoundingClientRect().y
-      let b = document.createElement('div')
-      b.className = 'trailBall'
-      let xx = Math.floor(Math.random() * 15) + 5
-      b.style.left = x + xx - gc_loc.left + 'px'
-      b.style.top = y - 3 - gc_loc.top + 'px'
-      b.onanimationend = function () {
-        b.remove()
-      }
-      gc.appendChild(b)
+      let b = document.createElement('div');
+      b.className = 'trailBall';
+      let xx = Math.floor(Math.random() * 15) + 5;
+      b.style.left = px + xx + 'px';
+      b.style.top = py - 3 + 'px';
+      b.onanimationend = function () { b.remove(); };
+      gc.appendChild(b);
     }
-
   }
 
   // key tracking — register listeners only once
@@ -853,16 +898,98 @@ window.addEventListener('load', function() {
 });
 
 function showVictory() {
-    // GAME COMPLETED
-    document.getElementById('victory_screen').style.display = 'flex';
-    document.getElementById('final_time').innerText = secondsToTime(timer);
-    document.getElementById('final_deaths').innerText = deaths;
-    
-    if (typeof sfx !== 'undefined' && sfx.win) sfx.win();
+    // Stop game loop first
+    window.startGameLoop = null;
     stopBackgroundMusic();
-    
-    // Stop game loop
-    window.startGameLoop = null; 
+
+    // Show cutscene first, then victory
+    showCutscene(function() {
+        document.getElementById('victory_screen').style.display = 'flex';
+        document.getElementById('final_time').innerText = secondsToTime(timer);
+        document.getElementById('final_deaths').innerText = deaths;
+        if (typeof sfx !== 'undefined' && sfx.win) sfx.win();
+    });
+}
+
+function showCutscene(onDone) {
+    const screen  = document.getElementById('cutscene_screen');
+    const canvas  = document.getElementById('cutscene_canvas');
+    const skipBtn = document.getElementById('cutscene_skip');
+
+    // Lines to display — each is [text, delay_ms, classes]
+    const lines = [
+        { id: 'cs_line1', text: 'You survived every spike.',      delay: 400,  cls: 'cs-visible' },
+        { id: 'cs_line2', text: 'Every fall.',                    delay: 1800, cls: 'cs-visible cs-dim' },
+        { id: 'cs_line3', text: 'Every impossible moment.',       delay: 3000, cls: 'cs-visible' },
+        { id: 'cs_line4', text: 'HASSAN — The Dasher.',           delay: 4600, cls: 'cs-visible cs-highlight' },
+    ];
+
+    screen.style.display = 'flex';
+
+    // ── Starfield canvas ──
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.3,
+        speed: Math.random() * 0.6 + 0.1,
+        opacity: Math.random()
+    }));
+
+    let rafId;
+    function drawStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+            s.y += s.speed;
+            if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,255,255,${(0.3 + s.opacity * 0.7).toFixed(2)})`;
+            ctx.fill();
+        });
+        rafId = requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    // ── Reveal each line ──
+    lines.forEach(({ id, text, delay, cls }) => {
+        setTimeout(() => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = text;
+            el.className   = 'cutscene-line ' + cls;
+        }, delay);
+    });
+
+    // ── After last line, wait then auto-proceed ──
+    const AUTO_PROCEED = 7800;
+
+    function finish() {
+        cancelAnimationFrame(rafId);
+        screen.style.transition = 'opacity 0.9s ease';
+        screen.style.opacity    = '0';
+        setTimeout(() => {
+            screen.style.display  = 'none';
+            screen.style.opacity  = '1';
+            screen.style.transition = '';
+            // reset lines for re-use
+            lines.forEach(({ id }) => {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = ''; el.className = 'cutscene-line'; }
+            });
+            if (typeof onDone === 'function') onDone();
+        }, 950);
+    }
+
+    let autoTimer = setTimeout(finish, AUTO_PROCEED);
+
+    skipBtn.onclick = function () {
+        clearTimeout(autoTimer);
+        finish();
+    };
 }
 
 // ============================================
@@ -917,10 +1044,32 @@ function stopBackgroundMusic() {
 // RESPONSIVE — update CSS scale on resize
 // ============================================
 function updateGameScale() {
-  const scale = Math.min(1, (window.innerWidth - 20) / 1020);
+  const maxW = GAME_WIDTH + 20;
+  const scale = Math.min(1, (window.innerWidth - 20) / maxW);
   document.documentElement.style.setProperty('--game-scale', scale.toFixed(4));
+  // Refresh gc_loc after scale change
+  gc_loc = getGcLoc();
+  // Re-sync player x position to the new gc_loc
+  var currentPl = document.querySelector('#' + player);
+  if (currentPl) {
+    var plLeft = parseFloat(currentPl.style.left) || 0;
+    // Clamp within game bounds (internal coordinates)
+    if (plLeft < 0) currentPl.style.left = '0px';
+    if (plLeft + tile_size > GAME_WIDTH) currentPl.style.left = (GAME_WIDTH - tile_size) + 'px';
+    // Clamp top
+    var plTop = parseFloat(currentPl.style.top) || 0;
+    var maxTop = (tile_size * rows) - tile_size;
+    if (plTop < 0) currentPl.style.top = '0px';
+    if (plTop > maxTop) currentPl.style.top = maxTop + 'px';
+  }
 }
-window.addEventListener('resize', updateGameScale);
+window.addEventListener('resize', function() {
+  updateGameScale();
+  // Force gc_loc refresh after a short delay for layout to settle
+  setTimeout(function() {
+    gc_loc = getGcLoc();
+  }, 100);
+});
 updateGameScale();
 
 window.focus()

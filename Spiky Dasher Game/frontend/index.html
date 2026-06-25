@@ -60,6 +60,20 @@
       double jump / wall sliding
     </p>
   </div>
+  <!-- Cutscene Screen (shown after last level, before victory) -->
+  <div id="cutscene_screen" style="display: none;">
+    <canvas id="cutscene_canvas"></canvas>
+    <div class="cutscene-content">
+      <div class="cutscene-lines">
+        <p class="cutscene-line" id="cs_line1"></p>
+        <p class="cutscene-line" id="cs_line2"></p>
+        <p class="cutscene-line" id="cs_line3"></p>
+        <p class="cutscene-line" id="cs_line4"></p>
+      </div>
+      <button class="cutscene-skip-btn" id="cutscene_skip">SKIP &rsaquo;</button>
+    </div>
+  </div>
+
   <div id="victory_screen" style="display: none;">
     <div class="victory-content">
       <h1 class="neon-title">MISSION COMPLETE</h1>
