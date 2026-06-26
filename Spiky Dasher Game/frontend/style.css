@@ -557,31 +557,67 @@ h2 {
 }
 
 .victory-content {
-  border: 4px solid cyan;
+  background: rgba(10, 15, 25, 0.75);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 255, 255, 0.45);
   padding: 40px 60px;
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 30px cyan, inset 0 0 30px cyan;
-  border-radius: 20px;
-  transform: scale(0.8);
+  border-radius: 24px;
   opacity: 0;
-  animation: popup-victory 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: neon-flicker-once 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes popup-victory {
-  to { transform: scale(1); opacity: 1; }
+@keyframes neon-flicker-once {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+    border-color: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  }
+  10% {
+    opacity: 0.5;
+    border-color: rgba(0, 255, 255, 0.45);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+  }
+  12% {
+    border-color: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.02);
+  }
+  14% {
+    opacity: 0.8;
+    border-color: rgba(0, 255, 255, 0.45);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+  }
+  16% {
+    border-color: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.02);
+  }
+  22% {
+    opacity: 1;
+    transform: translateY(0);
+    border-color: rgba(0, 255, 255, 0.45);
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    border-color: rgba(0, 255, 255, 0.45);
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.7),
+      0 0 50px rgba(0, 255, 255, 0.15),
+      inset 0 0 20px rgba(0, 255, 255, 0.05);
+  }
 }
 
 .neon-title {
-  font-size: 3.5rem;
-  color: #fff;
-  text-shadow: 
-    0 0 5px #fff,
-    0 0 10px #fff,
-    0 0 20px cyan,
-    0 0 40px cyan,
-    0 0 80px cyan;
-  margin-bottom: 30px;
-  letter-spacing: 5px;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 30%, #00ffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 25px;
+  letter-spacing: 6px;
+  filter: drop-shadow(0 2px 8px rgba(0, 255, 255, 0.3));
 }
 
 .stats-container {
@@ -592,10 +628,17 @@ h2 {
 }
 
 .stat-box {
-  background: linear-gradient(45deg, rgba(0,255,255,0.1), transparent);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  border-radius: 12px;
   padding: 15px 30px;
-  border-left: 3px solid cyan;
-  border-right: 3px solid cyan;
+  min-width: 140px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.stat-box:hover {
+  border-color: rgba(0, 255, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
 }
 
 .stat-box h2 {
@@ -613,24 +656,30 @@ h2 {
 
 #restart_btn {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1.5rem;
-  background: transparent;
-  color: cyan;
-  border: 2px solid cyan;
-  padding: 15px 40px;
-  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.02));
+  color: #00ffff;
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  border-radius: 50px;
+  padding: 14px 45px;
+  margin-top: 15px;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  transition: 0.3s;
-  position: relative;
-  overflow: hidden;
+  letter-spacing: 3px;
+  transition: all 0.3s ease;
 }
 
 #restart_btn:hover {
-  background: cyan;
-  color: black;
-  box-shadow: 0 0 30px cyan;
+  background: #00ffff;
+  color: #000;
+  border-color: #00ffff;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+#restart_btn:active {
+  transform: translateY(0);
 }
 
 /* Player Jump Animation */
@@ -1089,6 +1138,85 @@ main:has(.willem-header.is--loading) {
   }
 }
 
+/* ============================================
+   MOBILE TOUCH CONTROLS
+   ============================================ */
+#mobile_controls {
+  display: none; /* Hidden by default on desktop */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100000;
+  padding: 12px 20px 20px;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.mobile-controls-left,
+.mobile-controls-right {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.mobile-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(0, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.1), inset 0 0 8px rgba(0, 255, 255, 0.05);
+}
+
+.mobile-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+.mobile-btn:active,
+.mobile-btn.pressed {
+  background: rgba(0, 255, 255, 0.25);
+  border-color: rgba(0, 255, 255, 0.8);
+  transform: scale(0.92);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 12px rgba(0, 255, 255, 0.15);
+  color: #00ffff;
+}
+
+.mobile-btn-jump {
+  width: 80px;
+  height: 80px;
+}
+
+.mobile-btn-jump svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* Show mobile controls only on touch devices / small screens */
+@media (hover: none) and (pointer: coarse) {
+  #mobile_controls {
+    display: flex;
+  }
+  html, body {
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+}
+
 /* laser hazard */
 .laser {
   background: transparent;
@@ -1193,6 +1321,15 @@ main:has(.willem-header.is--loading) {
 .cutscene-line.cs-dim {
   opacity: 0.35;
   transform: translateY(0);
+}
+
+.cutscene-line.cs-stat {
+  font-weight: bold;
+  color: #00ffff;
+  font-size: clamp(1.1rem, 2.8vw, 1.6rem);
+  text-shadow:
+    0 0 8px rgba(0, 255, 255, 0.8),
+    0 0 24px rgba(0, 255, 255, 0.4);
 }
 
 .cutscene-line.cs-highlight {

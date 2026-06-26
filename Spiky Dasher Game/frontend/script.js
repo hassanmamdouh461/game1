@@ -255,33 +255,6 @@ const levels = [
       8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8]
   },
   {
-    start: '4,7',
-    map: [
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 7, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 0, 0, 0, 0, 0, 0, 1, 1, 10, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 0, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 0, 0, 0, 10, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 10, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 0, 4, 4, 10, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 4, 1, 1, 10, 4, 4, 4, 1, 1, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 1, 0, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 0, 6, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      0, 0, 1, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      0, 0, 1, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9,
-      0, 0, 1, 1, 1, 0, 1, 1, 1, 10, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 0, 1, 1, 1, 0, 1, 1, 1, 11, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0
-    ]
-  },
-  {
     start: '1,2',
     map: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0,
@@ -305,8 +278,33 @@ const levels = [
       8, 8, 8, 8, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 8, 8, 8, 8,
       8, 8, 8, 8, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 8, 8, 8, 8,
       8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8]
-
-
+  },
+  {
+    start: '2,2',
+    map: [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 0,
+      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 10, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 6, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 0, 0, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 0,
+      0, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 9, 0,
+      0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ]
   },
   {
     start: '1,2',
@@ -741,6 +739,10 @@ function initWillemLoadingAnimation(onComplete) {
 	const headerLetter = container.querySelectorAll('.willem__letter-white')
 	const navLinks = container.querySelectorAll('.willen-nav a, .osmo-credits__p')
 
+	const startLetters = container.querySelectorAll('.willem__h1-start .willem__letter');
+	const endLetters = container.querySelectorAll('.willem__h1-end .willem__letter');
+	const slides = container.querySelectorAll('.intro-slide');
+
 	/* GSAP Timeline */
 	const tl = gsap.timeline({
 		defaults: {
@@ -752,13 +754,21 @@ function initWillemLoadingAnimation(onComplete) {
         onComplete: onComplete
 	})
 
-	/* Start of Timeline */
-	if (loadingLetter) {
-		tl.from(loadingLetter, {
+	/* Start of Timeline (HAS from bottom, SAN from top) */
+	if (startLetters.length) {
+		tl.from(startLetters, {
 			yPercent: 100,
 			stagger: 0.025,
 			duration: 1.25,
-		})
+		}, 0)
+	}
+
+	if (endLetters.length) {
+		tl.from(endLetters, {
+			yPercent: -100,
+			stagger: 0.025,
+			duration: 1.25,
+		}, 0)
 	}
 
 	if (box.length) {
@@ -781,30 +791,50 @@ function initWillemLoadingAnimation(onComplete) {
 		tl.fromTo(coverImageExtra, { opacity: 1 }, { opacity: 0, duration: 0.05, ease: 'none', stagger: 0.5 }, '-=0.05')
 	}
 
-    // المرحلة الأولى: Zoom بسيط
+    // انكماش الكلمة وإغلاق الصندوق بعد انتهاء الصور (عند الثانية 5.2)
     if (box.length) {
-        tl.to(box, {
-            scale: 2.5,
-            duration: 1.2,
-            ease: 'power2.inOut'
-        }, '+=0.3');
+        tl.to(box, { width: '0em', duration: 1.0, ease: 'power2.inOut' }, 5.2);
+        tl.to(growingImage, { width: '0%', duration: 1.0, ease: 'power2.inOut' }, 5.2);
+    }
+    if (headingStart.length) {
+        tl.to(headingStart, { x: '0em', duration: 1.0, ease: 'power2.inOut' }, 5.2);
+    }
+    if (headingEnd.length) {
+        tl.to(headingEnd, { x: '0em', duration: 1.0, ease: 'power2.inOut' }, 5.2);
     }
 
-    // إبعاد كلمة HASSAN أثناء الزوم
-    if (headingStart.length) {
-        tl.to(headingStart, {
-            x: '-200%',
-            duration: 1.2,
+    // إبعاد كلمة HASSAN بعد الانكماش (الشمال لفوق واليمين لتحت مع الاختفاء) (عند الثانية 6.2)
+    if (startLetters.length) {
+        tl.to(startLetters, {
+            yPercent: -120,
+            opacity: 0,
+            duration: 1.0,
             ease: 'power2.inOut'
-        }, '<');
+        }, 6.2);
     }
     
-    if (headingEnd.length) {
-        tl.to(headingEnd, {
-            x: '200%',
-            duration: 1.2,
+    if (endLetters.length) {
+        tl.to(endLetters, {
+            yPercent: 120,
+            opacity: 0,
+            duration: 1.0,
             ease: 'power2.inOut'
-        }, '<');
+        }, 6.2);
+    }
+
+    // عرض الصور واحدة تلو الأخرى بشكل احترافي (Slideshow cross-fade)
+    if (slides.length >= 5) {
+        tl.to(slides[0], { opacity: 0, duration: 0.4, ease: 'power1.inOut' }, 2.2);
+        tl.to(slides[1], { opacity: 1, duration: 0.4, ease: 'power1.inOut' }, 2.2);
+
+        tl.to(slides[1], { opacity: 0, duration: 0.4, ease: 'power1.inOut' }, 3.0);
+        tl.to(slides[2], { opacity: 1, duration: 0.4, ease: 'power1.inOut' }, 3.0);
+
+        tl.to(slides[2], { opacity: 0, duration: 0.4, ease: 'power1.inOut' }, 3.8);
+        tl.to(slides[3], { opacity: 1, duration: 0.4, ease: 'power1.inOut' }, 3.8);
+
+        tl.to(slides[3], { opacity: 0, duration: 0.4, ease: 'power1.inOut' }, 4.6);
+        tl.to(slides[4], { opacity: 1, duration: 0.4, ease: 'power1.inOut' }, 4.6);
     }
 }
 
@@ -902,26 +932,24 @@ function showVictory() {
     window.startGameLoop = null;
     stopBackgroundMusic();
 
-    // Show cutscene first, then victory
-    showCutscene(function() {
-        document.getElementById('victory_screen').style.display = 'flex';
-        document.getElementById('final_time').innerText = secondsToTime(timer);
-        document.getElementById('final_deaths').innerText = deaths;
-        if (typeof sfx !== 'undefined' && sfx.win) sfx.win();
-    });
+    // Show cutscene (which now handles showing victory results internally on the same page)
+    showCutscene();
 }
 
-function showCutscene(onDone) {
+function showCutscene() {
     const screen  = document.getElementById('cutscene_screen');
     const canvas  = document.getElementById('cutscene_canvas');
     const skipBtn = document.getElementById('cutscene_skip');
+
+    if (skipBtn) skipBtn.style.display = 'block';
 
     // Lines to display — each is [text, delay_ms, classes]
     const lines = [
         { id: 'cs_line1', text: 'You survived every spike.',      delay: 400,  cls: 'cs-visible' },
         { id: 'cs_line2', text: 'Every fall.',                    delay: 1800, cls: 'cs-visible cs-dim' },
         { id: 'cs_line3', text: 'Every impossible moment.',       delay: 3000, cls: 'cs-visible' },
-        { id: 'cs_line4', text: 'HASSAN — The Dasher.',           delay: 4600, cls: 'cs-visible cs-highlight' },
+        { id: 'cs_line4', text: 'TIME: ' + secondsToTime(timer),  delay: 4200, cls: 'cs-visible cs-stat' },
+        { id: 'cs_line5', text: 'DEATHS: ' + deaths,              delay: 5400, cls: 'cs-visible cs-stat' }
     ];
 
     screen.style.display = 'flex';
@@ -954,41 +982,48 @@ function showCutscene(onDone) {
     }
     drawStars();
 
+    const lineTimers = [];
+
     // ── Reveal each line ──
     lines.forEach(({ id, text, delay, cls }) => {
-        setTimeout(() => {
+        const tId = setTimeout(() => {
             const el = document.getElementById(id);
             if (!el) return;
             el.textContent = text;
             el.className   = 'cutscene-line ' + cls;
         }, delay);
+        lineTimers.push(tId);
     });
 
-    // ── After last line, wait then auto-proceed ──
-    const AUTO_PROCEED = 7800;
+    // ── Function to finish cutscene showing results and playing sound ──
+    function showResults() {
+        if (skipBtn) skipBtn.style.display = 'none';
 
-    function finish() {
-        cancelAnimationFrame(rafId);
-        screen.style.transition = 'opacity 0.9s ease';
-        screen.style.opacity    = '0';
-        setTimeout(() => {
-            screen.style.display  = 'none';
-            screen.style.opacity  = '1';
-            screen.style.transition = '';
-            // reset lines for re-use
-            lines.forEach(({ id }) => {
-                const el = document.getElementById(id);
-                if (el) { el.textContent = ''; el.className = 'cutscene-line'; }
-            });
-            if (typeof onDone === 'function') onDone();
-        }, 950);
+        // Play win sfx
+        if (typeof sfx !== 'undefined' && sfx.win) sfx.win();
     }
 
-    let autoTimer = setTimeout(finish, AUTO_PROCEED);
+    // ── After last line, wait then show results ──
+    const AUTO_PROCEED = 6500; // Show final complete state after 6.5 seconds
+    let autoTimer = setTimeout(showResults, AUTO_PROCEED);
 
     skipBtn.onclick = function () {
         clearTimeout(autoTimer);
-        finish();
+        
+        // Clear pending line animations
+        lineTimers.forEach(tId => clearTimeout(tId));
+
+        // Instantly show all lines
+        lines.forEach(({ id, text, cls }) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = text;
+                el.className   = 'cutscene-line ' + cls;
+            }
+        });
+
+        // Show results
+        showResults();
     };
 }
 
@@ -1073,3 +1108,58 @@ window.addEventListener('resize', function() {
 updateGameScale();
 
 window.focus()
+
+// ============================================
+// MOBILE TOUCH CONTROLS
+// ============================================
+;(function() {
+  var btnLeft  = document.getElementById('btn_left');
+  var btnRight = document.getElementById('btn_right');
+  var btnJump  = document.getElementById('btn_jump');
+
+  if (!btnLeft || !btnRight || !btnJump) return;
+
+  // Map buttons to key codes: 37=ArrowLeft, 39=ArrowRight, 38=ArrowUp(jump)
+  var buttonMap = [
+    { el: btnLeft,  keyCode: 37 },
+    { el: btnRight, keyCode: 39 },
+    { el: btnJump,  keyCode: 38 }
+  ];
+
+  buttonMap.forEach(function(item) {
+    item.el.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      keys[item.keyCode] = true;
+      item.el.classList.add('pressed');
+    }, { passive: false });
+
+    item.el.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      keys[item.keyCode] = false;
+      item.el.classList.remove('pressed');
+      // Reset player visual like keyup does
+      var currentPl = document.querySelector('#' + player);
+      if (currentPl) {
+        currentPl.className = '';
+        currentPl.style.transform = 'rotate(0deg)';
+      }
+    }, { passive: false });
+
+    item.el.addEventListener('touchcancel', function(e) {
+      keys[item.keyCode] = false;
+      item.el.classList.remove('pressed');
+    }, { passive: false });
+
+    // Prevent context menu on long press
+    item.el.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+  });
+
+  // Prevent page scrolling when touching the game area on mobile
+  document.addEventListener('touchmove', function(e) {
+    if (document.getElementById('mobile_controls').style.display !== 'none') {
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();

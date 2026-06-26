@@ -22,9 +22,11 @@
               <div class="willem-loader__box-inner">
                  <div class="willem__growing-image">
                     <div class="willem__growing-image-wrap">
-                       <video class="willem__cover-image"
-                          src="IMG_4040.MP4"
-                          autoplay muted playsinline loop></video>
+                       <img class="willem__cover-image intro-slide" src="intro_1.png" style="opacity: 1;">
+                       <img class="willem__cover-image intro-slide" src="intro_2.png" style="opacity: 0;">
+                       <img class="willem__cover-image intro-slide" src="intro_3.png" style="opacity: 0;">
+                       <img class="willem__cover-image intro-slide" src="intro_4.png" style="opacity: 0;">
+                       <img class="willem__cover-image intro-slide" src="intro_5.png" style="opacity: 0;">
                     </div>
                  </div>
               </div>
@@ -60,7 +62,7 @@
       double jump / wall sliding
     </p>
   </div>
-  <!-- Cutscene Screen (shown after last level, before victory) -->
+  <!-- Cutscene Screen (shown after last level) -->
   <div id="cutscene_screen" style="display: none;">
     <canvas id="cutscene_canvas"></canvas>
     <div class="cutscene-content">
@@ -68,26 +70,11 @@
         <p class="cutscene-line" id="cs_line1"></p>
         <p class="cutscene-line" id="cs_line2"></p>
         <p class="cutscene-line" id="cs_line3"></p>
-        <p class="cutscene-line" id="cs_line4"></p>
+        <p class="cutscene-line cs-stat" id="cs_line4" style="margin-top: 20px;"></p>
+        <p class="cutscene-line cs-stat" id="cs_line5"></p>
       </div>
-      <button class="cutscene-skip-btn" id="cutscene_skip">SKIP &rsaquo;</button>
-    </div>
-  </div>
 
-  <div id="victory_screen" style="display: none;">
-    <div class="victory-content">
-      <h1 class="neon-title">MISSION COMPLETE</h1>
-      <div class="stats-container">
-        <div class="stat-box">
-          <h2>TIME</h2>
-          <p id="final_time">00:00:00</p>
-        </div>
-        <div class="stat-box">
-          <h2>DEATHS</h2>
-          <p id="final_deaths">0</p>
-        </div>
-      </div>
-      <button id="restart_btn">PLAY AGAIN</button>
+      <button class="cutscene-skip-btn" id="cutscene_skip">SKIP &rsaquo;</button>
     </div>
   </div>
   <div id='game_console'>
@@ -104,6 +91,22 @@
     </div>
   </div>
 
+  <!-- Mobile Touch Controls -->
+  <div id="mobile_controls">
+    <div class="mobile-controls-left">
+      <button class="mobile-btn" id="btn_left" aria-label="Move Left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="mobile-btn" id="btn_right" aria-label="Move Right">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="mobile-controls-right">
+      <button class="mobile-btn mobile-btn-jump" id="btn_jump" aria-label="Jump">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
+  </div>
   <script src="script.js"></script>
 
 </body>

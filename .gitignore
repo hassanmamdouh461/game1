@@ -20,3 +20,11 @@ desktop.ini
 # Environment
 .env
 .env.local
+
+# Git Portable
+PortableGit/
+
+# Python scripts and backups
+*.py
+Spiky Dasher Game/frontend/style_orig.css
+
