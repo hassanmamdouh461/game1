@@ -651,7 +651,27 @@ function buildGame(shouldStart = true) {
       tc.innerHTML = 'TIME<br>' + secondsToTime(timer);
 
       playerTrail();
-      if (!paused) setTimeout(updatePlayer, 1000 / 45);
+      if (!paused) requestAnimationFrame(gameLoop);
+    }
+  }
+
+  let lastTime = 0;
+  const interval = 1000 / 45;
+
+  function gameLoop(timestamp) {
+    if (localLoopId !== activeLoopId || paused) {
+      loopRunning = false;
+      return;
+    }
+
+    if (!lastTime) lastTime = timestamp;
+    const elapsed = timestamp - lastTime;
+
+    if (elapsed >= interval) {
+      updatePlayer();
+      lastTime = timestamp - (elapsed % interval);
+    } else {
+      requestAnimationFrame(gameLoop);
     }
   }
 
@@ -659,7 +679,8 @@ function buildGame(shouldStart = true) {
     if (localLoopId !== activeLoopId) return;
     if (!loopRunning) {
       loopRunning = true;
-      updatePlayer();
+      lastTime = 0;
+      requestAnimationFrame(gameLoop);
     }
   }
 
