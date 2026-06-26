@@ -1141,6 +1141,12 @@ main:has(.willem-header.is--loading) {
   }
 }
 
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  html, body {
+    padding-bottom: 0 !important; /* No shift in landscape! Center fully! */
+  }
+}
+
 /* laser hazard */
 .laser {
   background: transparent;

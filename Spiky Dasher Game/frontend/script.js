@@ -1182,11 +1182,14 @@ function stopBackgroundMusic() {
 function updateGameScale() {
   const maxW = GAME_WIDTH;
   const maxH = 550; // tile_size * rows = 25 * 22
-  const paddingX = 24;
   
-  // Detect if touch is supported (which usually means mobile controls are visible)
+  // Detect if touch is supported
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  const paddingY = isTouch ? 130 : 40; // reserve space for mobile controls at bottom
+  const isLandscape = window.innerWidth > window.innerHeight;
+  
+  // On mobile landscape, allow controls to overlay the corners to maximize size
+  const paddingX = (isTouch && isLandscape) ? 16 : 24;
+  const paddingY = (isTouch && isLandscape) ? 16 : (isTouch ? 130 : 40);
   
   const scaleX = (window.innerWidth - paddingX) / maxW;
   const scaleY = (window.innerHeight - paddingY) / maxH;
