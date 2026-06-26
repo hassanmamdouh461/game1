@@ -28,6 +28,7 @@ body {
   display: grid;
   place-items: center;
   background: #111;
+  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b239d7aeb290a31ac5_cursor-default%402x.svg") 2 0, auto;
 }
 
 #game_console {
@@ -774,12 +775,16 @@ body.intro-mode {
   background-color: #f4f4f4 !important;
   font-family: 'PP Neue Montreal', Arial, sans-serif;
   color: #201d1d;
-  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b239d7aeb290a31ac5_cursor-default%402x.svg") 2 0, auto;
 }
 
-body.intro-mode a,
-body.intro-mode button {
-  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b212e6b71494aa67ff_cursor-pointer%402x.svg") 12 0, pointer;
+a,
+button,
+[role="button"],
+.mobile-btn,
+.cutscene-skip-btn,
+#start_btn,
+#restart_btn {
+  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b212e6b71494aa67ff_cursor-pointer%402x.svg") 12 0, pointer !important;
 }
 
 /* Disable Scroll on Loading */
