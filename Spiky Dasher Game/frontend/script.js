@@ -311,11 +311,9 @@ function buildGame(shouldStart = true) {
   const localLoopId = activeLoopId;
   let loopRunning = false;
 
-  // Clear and rebuild layout with the transparent FX Canvas and updated counters
+  // Clear and rebuild layout with the transparent FX Canvas
   gc.innerHTML = `
     <div id="${player}"></div>
-    <div id="deaths_counter">DEATHS<br><span class="value">${deaths}</span></div>
-    <div id="time_counter">TIME<br><span class="value">${secondsToTime(timer)}</span></div>
     <canvas id="fx_canvas" width="1000" height="550" style="position: absolute; top: 0; left: 0; width: 1000px; height: 550px; pointer-events: none; z-index: 15000;"></canvas>
   `;
 
@@ -390,8 +388,8 @@ function buildGame(shouldStart = true) {
     createLevelFlash();
   }
 
-  let tcValue = gc.querySelector('#time_counter .value');
-  let dcValue = gc.querySelector('#deaths_counter .value');
+  let tcValue = document.querySelector('#time_counter .value');
+  let dcValue = document.querySelector('#deaths_counter .value');
   if (tcValue) tcValue.textContent = secondsToTime(timer);
   if (dcValue) dcValue.textContent = deaths;
 
@@ -1220,6 +1218,15 @@ window.addEventListener('resize', function() {
   setTimeout(function() {
     gc_loc = getGcLoc();
   }, 100);
+});
+window.addEventListener('orientationchange', function() {
+  updateGameScale();
+  setTimeout(function() {
+    gc_loc = getGcLoc();
+  }, 200);
+});
+window.addEventListener('load', function() {
+  updateGameScale();
 });
 updateGameScale();
 

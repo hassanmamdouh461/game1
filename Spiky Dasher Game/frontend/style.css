@@ -1136,6 +1136,8 @@ main:has(.willem-header.is--loading) {
   html, body {
     overflow: hidden;
     touch-action: manipulation;
+    padding-bottom: 110px; /* Shift the visual center upward to prevent controls overlap */
+    box-sizing: border-box;
   }
 }
 
