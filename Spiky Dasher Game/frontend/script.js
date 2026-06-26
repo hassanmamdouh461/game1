@@ -15,90 +15,12 @@ function screenShake() {
   setTimeout(() => gc.classList.remove('shake'), 500);
 }
 
-function createWallSparks(x, y, direction = 'right') {
-  for (let i = 0; i < 5; i++) {
-    const spark = document.createElement('div');
-    spark.classList.add('wall-spark');
-    spark.style.left = x + (direction === 'right' ? 25 : 0) + 'px';
-    spark.style.top = (y + Math.random() * 20) + 'px';
-    
-    gc.appendChild(spark);
-    
-    setTimeout(() => spark.remove(), 500);
-  }
-}
-
-function createLevelFlash() {
-  const flash = document.createElement('div');
-  flash.classList.add('level-flash');
-  gc.appendChild(flash);
-  
-  setTimeout(() => flash.remove(), 600);
-}
-
-function createPortalWarp(x, y) {
-  // Create warp effect
-  for (let i = 0; i < 15; i++) {
-    const particle = document.createElement('div');
-    particle.classList.add('warp-particle');
-    particle.style.left = x + 'px';
-    particle.style.top = y + 'px';
-    
-    const angle = (Math.PI * 2 * i) / 15;
-    const distance = 50;
-    particle.style.setProperty('--warp-x', Math.cos(angle) * distance + 'px');
-    particle.style.setProperty('--warp-y', Math.sin(angle) * distance + 'px');
-    
-    gc.appendChild(particle);
-    setTimeout(() => particle.remove(), 800);
-  }
-}
-
 function secondsToTime(e) {
   var totalSec = e / 45;
   var m  = Math.floor(totalSec / 60).toString().padStart(2, '0');
   var s  = Math.floor(totalSec % 60).toString().padStart(2, '0');
   var cs = Math.floor((totalSec % 1) * 100).toString().padStart(2, '0');
   return m + ':' + s + ':' + cs;
-}
-
-function createExplosion(x, y, color = 'cyan') {
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.classList.add('particle');
-    p.style.left = x + 'px';
-    p.style.top = y + 'px';
-    p.style.background = color;
-    
-    // Random velocity
-    const angle = Math.random() * Math.PI * 2;
-    const velocity = Math.random() * 5 + 2;
-    const vx = Math.cos(angle) * velocity;
-    const vy = Math.sin(angle) * velocity;
-    
-    gc.appendChild(p);
-    
-    let life = 1.0;
-    
-    function updateParticle() {
-      life -= 0.05;
-      if (life <= 0) {
-        p.remove();
-        return;
-      }
-      
-      const currentLeft = parseFloat(p.style.left);
-      const currentTop = parseFloat(p.style.top);
-      
-      p.style.left = (currentLeft + vx) + 'px';
-      p.style.top = (currentTop + vy) + 'px';
-      p.style.opacity = life;
-      p.style.transform = `scale(${life})`;
-      
-      requestAnimationFrame(updateParticle);
-    }
-    requestAnimationFrame(updateParticle);
-  }
 }
 
 // --- Sound Controller (Web Audio API) ---
@@ -388,13 +310,79 @@ function buildGame(shouldStart = true) {
   activeLoopId++;
   const localLoopId = activeLoopId;
   let loopRunning = false;
-  // clear tiles and update level number
-  gc.innerHTML = "<div id='" + player + "'></div><div id='deaths_counter'></div><div id='time_counter'></div>"
+
+  // Clear and rebuild layout with the transparent FX Canvas and updated counters
+  gc.innerHTML = `
+    <div id="${player}"></div>
+    <div id="deaths_counter">DEATHS<br><span class="value">${deaths}</span></div>
+    <div id="time_counter">TIME<br><span class="value">${secondsToTime(timer)}</span></div>
+    <canvas id="fx_canvas" width="1000" height="550" style="position: absolute; top: 0; left: 0; width: 1000px; height: 550px; pointer-events: none; z-index: 15000;"></canvas>
+  `;
+
   if (level_num < levels.length - 1) {
-    level_num++
+    level_num++;
   } else {
     showVictory();
     return; // Stop building next level
+  }
+
+  // Setup Canvas and arrays for Visual Effects
+  const fxCanvas = document.getElementById('fx_canvas');
+  const fxCtx = fxCanvas ? fxCanvas.getContext('2d') : null;
+  const trails = [];
+  const particles = [];
+  const sparks = [];
+  const warpParticles = [];
+  let flashOpacity = 0.0;
+
+  // Local effect triggers
+  function createExplosion(x, y, color = 'cyan') {
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = Math.random() * 5 + 2;
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * velocity,
+        vy: Math.sin(angle) * velocity,
+        life: 1.0,
+        decay: Math.random() * 0.03 + 0.02,
+        color: color,
+        size: 5
+      });
+    }
+  }
+
+  function createWallSparks(x, y, direction = 'right') {
+    const sparkX = x + (direction === 'right' ? 25 : 0);
+    for (let i = 0; i < 5; i++) {
+      sparks.push({
+        x: sparkX,
+        y: y + Math.random() * 20,
+        life: 1.0,
+        decay: 0.05,
+        speedY: Math.random() * 1.5 + 0.5
+      });
+    }
+  }
+
+  function createLevelFlash() {
+    flashOpacity = 1.0;
+  }
+
+  function createPortalWarp(x, y) {
+    for (let i = 0; i < 15; i++) {
+      const angle = (Math.PI * 2 * i) / 15;
+      const distance = 50;
+      warpParticles.push({
+        startX: x,
+        startY: y,
+        targetX: Math.cos(angle) * distance,
+        targetY: Math.sin(angle) * distance,
+        life: 1.0,
+        decay: 1 / 36
+      });
+    }
   }
 
   // Level transition flash
@@ -402,68 +390,52 @@ function buildGame(shouldStart = true) {
     createLevelFlash();
   }
 
-  let tc = document.querySelector('#time_counter')
-  let dc = document.querySelector('#deaths_counter')
-  tc.innerHTML = 'TIME<br>' + secondsToTime(timer)
-  dc.innerHTML = 'DEATHS<br>' + deaths
+  let tcValue = gc.querySelector('#time_counter .value');
+  let dcValue = gc.querySelector('#deaths_counter .value');
+  if (tcValue) tcValue.textContent = secondsToTime(timer);
+  if (dcValue) dcValue.textContent = deaths;
 
   // set random level color
-  document.body.style.setProperty('--root-clr', 'hsl(' + Math.random() * 360 + 'deg,75%,50%)')
+  document.body.style.setProperty('--root-clr', 'hsl(' + Math.random() * 360 + 'deg,75%,50%)');
 
-  // add tiles for new level
+  // Add tiles using DocumentFragment to prevent multiple reflows
+  const fragment = document.createDocumentFragment();
   for (var i = 0; i < cols * rows; i++) {
-    var tile = document.createElement('div')
-    tile.className = 'tile'
+    var tile = document.createElement('div');
+    tile.className = 'tile';
 
-    if (levels[level_num].map[i] == 0) {
-      tile.className = 'tile ground'
-    }
-    if (levels[level_num].map[i] == 2) {
-      tile.className = 'tile lava'
-    }
-    if (levels[level_num].map[i] == 3) {
-      tile.className = 'tile lava spleft'
-    }
-    if (levels[level_num].map[i] == 4) {
-      tile.className = 'tile lava sptop'
-    }
-    if (levels[level_num].map[i] == 5) {
-      tile.className = 'tile lava spright'
-    }
-    if (levels[level_num].map[i] == 6) {
-      tile.className = 'tile portal1'
-    }
-    if (levels[level_num].map[i] == 7) {
-      tile.className = 'tile portal2'
-    }
-    if (levels[level_num].map[i] == 8) {
-      tile.className = 'tile innerwall'
-    }
-    if (levels[level_num].map[i] == 9) {
-      tile.className = 'tile nextlevel'
-    }
-    if (levels[level_num].map[i] == 10) {
-      tile.className = 'tile laser'
-    }
-    if (levels[level_num].map[i] == 11) {
-      tile.className = 'tile laser-node'
-    }
-    tile.setAttribute('grid_loc', [i % cols, Math.floor(i / cols)])
-    tile.style.width = tile_size + 'px'
-    tile.style.height = tile_size + 'px'
-    tile.style.position = 'absolute'
-    tile.style.left = (i % cols) * tile_size + 'px'
-    tile.style.top = Math.floor(i / cols) * tile_size + 'px'
+    var mapVal = levels[level_num].map[i];
+    if (mapVal == 0) tile.className = 'tile ground';
+    else if (mapVal == 2) tile.className = 'tile lava';
+    else if (mapVal == 3) tile.className = 'tile lava spleft';
+    else if (mapVal == 4) tile.className = 'tile lava sptop';
+    else if (mapVal == 5) tile.className = 'tile lava spright';
+    else if (mapVal == 6) tile.className = 'tile portal1';
+    else if (mapVal == 7) tile.className = 'tile portal2';
+    else if (mapVal == 8) tile.className = 'tile innerwall';
+    else if (mapVal == 9) tile.className = 'tile nextlevel';
+    else if (mapVal == 10) tile.className = 'tile laser';
+    else if (mapVal == 11) tile.className = 'tile laser-node';
 
-    gc.appendChild(tile)
+    tile.setAttribute('grid_loc', [i % cols, Math.floor(i / cols)]);
+    tile.style.width = tile_size + 'px';
+    tile.style.height = tile_size + 'px';
+    tile.style.position = 'absolute';
+    tile.style.left = (i % cols) * tile_size + 'px';
+    tile.style.top = Math.floor(i / cols) * tile_size + 'px';
+
+    fragment.appendChild(tile);
   }
+  gc.appendChild(fragment);
 
   // add player stuff
-  var pl = document.querySelector('#' + player)
-  pl.style.width = tile_size + 'px'
-  pl.style.height = tile_size + 'px'
-  pl.style.top = (tile_size * levels[level_num].start.split(',')[1]) + 'px'
-  pl.style.left = (tile_size * levels[level_num].start.split(',')[0]) + 'px'
+  var pl = document.querySelector('#' + player);
+  if (pl) {
+    pl.style.width = tile_size + 'px';
+    pl.style.height = tile_size + 'px';
+    pl.style.top = (tile_size * levels[level_num].start.split(',')[1]) + 'px';
+    pl.style.left = (tile_size * levels[level_num].start.split(',')[0]) + 'px';
+  }
 
   var px = tile_size * parseFloat(levels[level_num].start.split(',')[0]);
   var py = tile_size * parseFloat(levels[level_num].start.split(',')[1]);
@@ -525,7 +497,7 @@ function buildGame(shouldStart = true) {
         if (gravity > 3) sfx.land();
         py = Math.floor(y12 / tile_size) * tile_size - tile_size;
         gravity = 0;
-        if (pl.classList.contains('jumping')) {
+        if (pl && pl.classList.contains('jumping')) {
            pl.classList.remove('jumping');
            pl.style.transform = 'rotate(0deg)'; 
         }
@@ -542,13 +514,13 @@ function buildGame(shouldStart = true) {
       if (((keys[38] || keys[32]) || (gp && (gp.buttons[0].pressed || gp.buttons[1].pressed || gp.buttons[2].pressed || gp.buttons[3].pressed))) && gravity == 0) {
         dbljump = false;
         gravity = -9;
-        pl.classList.add('jumping');
+        if (pl) pl.classList.add('jumping');
         sfx.jump();
       }
       if (((keys[38] || keys[32]) || (gp && (gp.buttons[0].pressed || gp.buttons[1].pressed || gp.buttons[2].pressed || gp.buttons[3].pressed))) && gravity > 0) {
         if (!dbljump) {
           gravity = -9;
-          pl.classList.add('jumping');
+          if (pl) pl.classList.add('jumping');
           sfx.jump();
         }
         dbljump = true;
@@ -558,15 +530,17 @@ function buildGame(shouldStart = true) {
       if (gp) {
         gpa = Math.round(gp.axes[0]);
         if (gpa == 0 || gravity == 0) {
-          pl.className = '';
-          pl.style.transform = 'rotate(0deg)';
+          if (pl) {
+            pl.className = '';
+            pl.style.transform = 'rotate(0deg)';
+          }
         }
       }
 
       if ((keys[37] || (gp && gpa == -1)) && px > 0) {
         if (!is_xy3_ground) {
           px -= x_speed;
-          if (!pl.classList.contains('jumping')) {
+          if (pl && !pl.classList.contains('jumping')) {
              pl.className = '';
              pl.classList.add('goleft');
           }
@@ -575,17 +549,17 @@ function buildGame(shouldStart = true) {
           if (gravity > 0) {
             dbljump = false;
             gravity = 1;
-            pl.style.transform = 'rotate(90deg)';
+            if (pl) pl.style.transform = 'rotate(90deg)';
             createWallSparks(px, py, 'left');
           }
-          pl.className = '';
+          if (pl) pl.className = '';
         }
       }
 
       if ((keys[39] || (gp && gpa == 1)) && px + tile_size < GAME_WIDTH) {
         if (!is_xy4_ground) {
           px += x_speed;
-          if (!pl.classList.contains('jumping')) {
+          if (pl && !pl.classList.contains('jumping')) {
              pl.className = '';
              pl.classList.add('goright');
           }
@@ -594,10 +568,10 @@ function buildGame(shouldStart = true) {
           if (gravity > 0) {
             dbljump = false;
             gravity = 1;
-            pl.style.transform = 'rotate(-90deg)';
+            if (pl) pl.style.transform = 'rotate(-90deg)';
             createWallSparks(px, py, 'right');
           }
-          pl.className = '';
+          if (pl) pl.className = '';
         }
       }
 
@@ -608,12 +582,12 @@ function buildGame(shouldStart = true) {
 
       if (px < 0) px = 0;
       if (px + tile_size > GAME_WIDTH) px = GAME_WIDTH - tile_size;
-      pl.style.left = px + 'px';
+      if (pl) pl.style.left = px + 'px';
 
       var maxTop = (tile_size * rows) - tile_size;
       if (py < 0) py = 0;
       if (py > maxTop) py = maxTop;
-      pl.style.top = py + 'px';
+      if (pl) pl.style.top = py + 'px';
 
       if (is_center_lava) {
         sfx.die();
@@ -621,10 +595,12 @@ function buildGame(shouldStart = true) {
         screenShake();
         px = tile_size * parseFloat(levels[level_num].start.split(',')[0]);
         py = tile_size * parseFloat(levels[level_num].start.split(',')[1]);
-        pl.style.top = py + 'px';
-        pl.style.left = px + 'px';
+        if (pl) {
+          pl.style.top = py + 'px';
+          pl.style.left = px + 'px';
+        }
         deaths++;
-        dc.innerHTML = 'DEATHS<br>' + deaths;
+        if (dcValue) dcValue.textContent = deaths;
       }
 
       if (is_center_portal1) {
@@ -632,8 +608,10 @@ function buildGame(shouldStart = true) {
         if (p2) {
           px = parseFloat(p2.style.left);
           py = parseFloat(p2.style.top);
-          pl.style.top = py + 'px';
-          pl.style.left = px + 'px';
+          if (pl) {
+            pl.style.top = py + 'px';
+            pl.style.left = px + 'px';
+          }
         }
       }
 
@@ -648,15 +626,108 @@ function buildGame(shouldStart = true) {
       }
 
       timer++;
-      tc.innerHTML = 'TIME<br>' + secondsToTime(timer);
+      if (tcValue) tcValue.textContent = secondsToTime(timer);
 
       playerTrail();
-      if (!paused) requestAnimationFrame(gameLoop);
     }
   }
 
   let lastTime = 0;
   const interval = 1000 / 45;
+
+  function updateAndRenderFXCanvas() {
+    if (!fxCtx) return;
+    
+    // Clear canvas
+    fxCtx.clearRect(0, 0, 1000, 550);
+    
+    // Update and draw trails
+    for (let i = trails.length - 1; i >= 0; i--) {
+      const t = trails[i];
+      t.life -= t.decay;
+      if (t.life <= 0) {
+        trails.splice(i, 1);
+        continue;
+      }
+      fxCtx.fillStyle = `rgba(0, 255, 255, ${t.life})`;
+      fxCtx.beginPath();
+      fxCtx.arc(t.x, t.y - (1 - t.life) * 25, t.size, 0, Math.PI * 2);
+      fxCtx.fill();
+    }
+    
+    // Update and draw particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.life -= p.decay;
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      p.x += p.vx;
+      p.y += p.vy;
+      fxCtx.fillStyle = p.color;
+      fxCtx.globalAlpha = p.life;
+      fxCtx.beginPath();
+      fxCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      fxCtx.fill();
+    }
+    fxCtx.globalAlpha = 1.0;
+    
+    // Update and draw sparks
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.life -= s.decay;
+      if (s.life <= 0) {
+        sparks.splice(i, 1);
+        continue;
+      }
+      s.y += s.speedY;
+      fxCtx.globalAlpha = s.life;
+      const grad = fxCtx.createLinearGradient(s.x, s.y, s.x, s.y + 8);
+      grad.addColorStop(0, 'orange');
+      grad.addColorStop(1, 'transparent');
+      fxCtx.fillStyle = grad;
+      fxCtx.fillRect(s.x, s.y, 3 * s.life, 8);
+    }
+    fxCtx.globalAlpha = 1.0;
+    
+    // Update and draw warp particles
+    for (let i = warpParticles.length - 1; i >= 0; i--) {
+      const w = warpParticles[i];
+      w.life -= w.decay;
+      if (w.life <= 0) {
+        warpParticles.splice(i, 1);
+        continue;
+      }
+      const progress = 1.0 - w.life;
+      let curX, curY, scale;
+      if (progress < 0.5) {
+        const p = progress * 2;
+        curX = w.startX + w.targetX * 0.5 * p;
+        curY = w.startY + w.targetY * 0.5 * p;
+        scale = 1.0 + 0.5 * p;
+      } else {
+        const p = (progress - 0.5) * 2;
+        curX = w.startX + w.targetX * 0.5 + w.targetX * 0.5 * p;
+        curY = w.startY + w.targetY * 0.5 + w.targetY * 0.5 * p;
+        scale = 1.5 - 1.3 * p;
+      }
+      fxCtx.globalAlpha = w.life;
+      fxCtx.fillStyle = 'cyan';
+      fxCtx.beginPath();
+      fxCtx.arc(curX, curY, 3 * scale, 0, Math.PI * 2);
+      fxCtx.fill();
+    }
+    fxCtx.globalAlpha = 1.0;
+    
+    // Draw level transition flash
+    if (flashOpacity > 0) {
+      flashOpacity -= 0.035;
+      if (flashOpacity < 0) flashOpacity = 0;
+      fxCtx.fillStyle = `rgba(255, 255, 255, ${flashOpacity})`;
+      fxCtx.fillRect(0, 0, 1000, 550);
+    }
+  }
 
   function gameLoop(timestamp) {
     if (localLoopId !== activeLoopId || paused) {
@@ -667,12 +738,17 @@ function buildGame(shouldStart = true) {
     if (!lastTime) lastTime = timestamp;
     const elapsed = timestamp - lastTime;
 
+    // 1. Render all Canvas FX at native screen refresh rate
+    updateAndRenderFXCanvas();
+
+    // 2. Run physics ticks if enough time has passed
     if (elapsed >= interval) {
       updatePlayer();
       lastTime = timestamp - (elapsed % interval);
-    } else {
-      requestAnimationFrame(gameLoop);
     }
+
+    // 3. Request next frame
+    requestAnimationFrame(gameLoop);
   }
 
   function startGameLoopWrapper() {
@@ -691,28 +767,29 @@ function buildGame(shouldStart = true) {
   }
 
   function playerTrail() {
-    // Throttle trail creation to reduce DOM overhead and layout thrashing (especially on mobile)
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     const throttleRate = isTouch ? 5 : 3;
     if (timer % throttleRate !== 0) return;
 
-    if (player == 'player') {
-      let b = document.createElement('div');
-      b.className = 'trailBall';
-      b.style.left = px + 11 + 'px';
-      b.style.top = py + 5 + 'px';
-      b.onanimationend = function () { b.remove(); };
-      gc.appendChild(b);
+    if (player === 'player') {
+      trails.push({
+        x: px + 11,
+        y: py + 5,
+        size: 3,
+        life: 1.0,
+        decay: 1 / (45 * 0.75)
+      });
     }
 
-    if (player == 'player2') {
-      let b = document.createElement('div');
-      b.className = 'trailBall';
+    if (player === 'player2') {
       let xx = Math.floor(Math.random() * 15) + 5;
-      b.style.left = px + xx + 'px';
-      b.style.top = py - 3 + 'px';
-      b.onanimationend = function () { b.remove(); };
-      gc.appendChild(b);
+      trails.push({
+        x: px + xx,
+        y: py - 3,
+        size: 3,
+        life: 1.0,
+        decay: 1 / (45 * 0.75)
+      });
     }
   }
 
@@ -1105,19 +1182,32 @@ function stopBackgroundMusic() {
 // RESPONSIVE — update CSS scale on resize
 // ============================================
 function updateGameScale() {
-  const maxW = GAME_WIDTH + 20;
-  const scale = Math.min(1, (window.innerWidth - 20) / maxW);
+  const maxW = GAME_WIDTH;
+  const maxH = 550; // tile_size * rows = 25 * 22
+  const paddingX = 24;
+  
+  // Detect if touch is supported (which usually means mobile controls are visible)
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  const paddingY = isTouch ? 130 : 40; // reserve space for mobile controls at bottom
+  
+  const scaleX = (window.innerWidth - paddingX) / maxW;
+  const scaleY = (window.innerHeight - paddingY) / maxH;
+  
+  // Clamp scale between 0.2 and 1.0
+  const scale = Math.max(0.2, Math.min(1.0, scaleX, scaleY));
+  
   document.documentElement.style.setProperty('--game-scale', scale.toFixed(4));
+  
   // Refresh gc_loc after scale change
   gc_loc = getGcLoc();
-  // Re-sync player x position to the new gc_loc
+  
+  // Re-sync player position clamping
   var currentPl = document.querySelector('#' + player);
   if (currentPl) {
     var plLeft = parseFloat(currentPl.style.left) || 0;
-    // Clamp within game bounds (internal coordinates)
     if (plLeft < 0) currentPl.style.left = '0px';
     if (plLeft + tile_size > GAME_WIDTH) currentPl.style.left = (GAME_WIDTH - tile_size) + 'px';
-    // Clamp top
+    
     var plTop = parseFloat(currentPl.style.top) || 0;
     var maxTop = (tile_size * rows) - tile_size;
     if (plTop < 0) currentPl.style.top = '0px';

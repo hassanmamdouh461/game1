@@ -19,6 +19,11 @@
     white;
 }
 
+/* Custom Cursor Globally */
+*, *::before, *::after {
+  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b239d7aeb290a31ac5_cursor-default%402x.svg") 2 0, auto;
+}
+
 html,
 body {
   min-width: 100vw;
@@ -28,7 +33,6 @@ body {
   display: grid;
   place-items: center;
   background: #111;
-  cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b239d7aeb290a31ac5_cursor-default%402x.svg") 2 0, auto;
 }
 
 #game_console {
@@ -363,24 +367,7 @@ h2 {
 .goleft:before,
 .goright:before {}
 
-.trailBall {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  background: cyan;
-  border-radius: 50%;
-  opacity: .75;
-  pointer-events: none;
-  opacity: 1;
-  animation: trail .75s linear forwards;
-}
-
-@keyframes trail {
-  100% {
-    transform: translateY(-25px);
-    opacity: 0;
-  }
-}
+/* Trail styles removed (now handled on canvas) */
 
 /* Intro Screen Styles */
 #loading_screen {
@@ -514,15 +501,7 @@ h2 {
 }
 
 /* Particle Effects */
-.particle {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  background: cyan;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 20000;
-}
+/* Particle styles removed (now handled on canvas) */
 
 /* Screen Shake Animation */
 .shake {
@@ -543,7 +522,7 @@ h2 {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(10, 10, 15, 0.95);
+  background: rgba(10, 10, 15, 0.98);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -552,13 +531,10 @@ h2 {
   color: white;
   font-family: 'Courier New', Courier, monospace;
   text-align: center;
-  backdrop-filter: blur(5px);
 }
 
 .victory-content {
-  background: rgba(10, 15, 25, 0.75);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  background: rgba(10, 15, 25, 0.96);
   border: 1px solid rgba(0, 255, 255, 0.45);
   padding: 40px 60px;
   border-radius: 24px;
@@ -701,73 +677,7 @@ h2 {
 }
 
 /* Level Transition Flash */
-.level-flash {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  pointer-events: none;
-  z-index: 50000;
-  animation: flash 0.6s ease-out forwards;
-}
-
-@keyframes flash {
-  0% { opacity: 1; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0; }
-}
-
-/* Wall Slide Particles */
-.wall-spark {
-  position: absolute;
-  width: 3px;
-  height: 8px;
-  background: linear-gradient(180deg, orange, transparent);
-  pointer-events: none;
-  z-index: 15000;
-  animation: spark-fall 0.5s ease-out forwards;
-}
-
-@keyframes spark-fall {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(30px) scale(0.5);
-    opacity: 0;
-  }
-}
-
-/* Warp Particles for Next Level Gate */
-.warp-particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: cyan;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 20000;
-  box-shadow: 0 0 10px cyan;
-  animation: warp-spiral 0.8s ease-out forwards;
-}
-
-@keyframes warp-spiral {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: translate(calc(var(--warp-x) * 0.5), calc(var(--warp-y) * 0.5)) scale(1.5) rotate(180deg);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translate(var(--warp-x), var(--warp-y)) scale(0.2) rotate(360deg);
-    opacity: 0;
-  }
-}
+/* DOM-based visual effects removed (now handled on canvas) */
 /* ------- Osmo Intro Animation Styles ------- */
 body.intro-mode {
   background-color: #f4f4f4 !important;
@@ -775,13 +685,9 @@ body.intro-mode {
   color: #201d1d;
 }
 
-a,
-button,
-[role="button"],
-.mobile-btn,
-.cutscene-skip-btn,
-#start_btn,
-#restart_btn {
+/* Custom Pointer Cursors Globally */
+a, button, [role="button"], .mobile-btn, .cutscene-skip-btn, #start_btn, #restart_btn,
+a *, button *, [role="button"] *, .mobile-btn *, .cutscene-skip-btn *, #start_btn *, #restart_btn * {
   cursor: url("https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/671251b212e6b71494aa67ff_cursor-pointer%402x.svg") 12 0, pointer !important;
 }
 
@@ -1062,13 +968,12 @@ main:has(.willem-header.is--loading) {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 1500000;
-  backdrop-filter: blur(4px);
 }
 
 .pause-content {
@@ -1388,6 +1293,91 @@ main:has(.willem-header.is--loading) {
   color: #fff;
   border-color: cyan;
   background: rgba(0,255,255,0.08);
+}
+
+/* Portrait orientation warning overlay */
+#portrait_overlay {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  #portrait_overlay {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0d0d11;
+    z-index: 99999999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+  }
+  
+  #portrait_overlay h2 {
+    font-size: 1.8rem;
+    color: cyan;
+    margin-top: 20px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+  
+  #portrait_overlay p {
+    font-size: 1rem;
+    color: #888;
+    max-width: 280px;
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+  
+  .phone-icon-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .phone-icon {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: white;
+    animation: rotate-phone 2s ease-in-out infinite;
+  }
+  
+  .arrow-icon {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: cyan;
+    opacity: 0.5;
+    animation: spin-arrow 2s linear infinite;
+  }
+  
+  /* Hide the rest of the game when in portrait to avoid layout shifts or double interactions */
+  #game_wrapper, #mobile_controls, #pause_screen {
+    display: none !important;
+  }
+}
+
+@keyframes rotate-phone {
+  0%, 10% { transform: rotate(0deg); }
+  40%, 60% { transform: rotate(-90deg); }
+  90%, 100% { transform: rotate(0deg); }
+}
+
+@keyframes spin-arrow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
 }
 
 

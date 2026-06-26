@@ -79,8 +79,8 @@
   </div>
   <div id="game_wrapper">
     <div id='game_console'>
-      <div id='deaths_counter'></div>
-      <div id='time_counter'></div>
+      <div id='deaths_counter'>DEATHS<br><span class="value">0</span></div>
+      <div id='time_counter'>TIME<br><span class="value">00:00:00</span></div>
     </div>
   </div>
 
@@ -109,6 +109,22 @@
       </button>
     </div>
   </div>
+
+  <!-- Device Orientation Overlay -->
+  <div id="portrait_overlay">
+    <div class="phone-icon-container">
+      <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+      <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+      </svg>
+    </div>
+    <h2>ROTATE YOUR DEVICE</h2>
+    <p>Please rotate your device to landscape mode for the best gaming experience.</p>
+  </div>
+
   <script src="script.js"></script>
 
 </body>
