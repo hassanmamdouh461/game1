@@ -670,6 +670,11 @@ function buildGame(shouldStart = true) {
   }
 
   function playerTrail() {
+    // Throttle trail creation to reduce DOM overhead and layout thrashing (especially on mobile)
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const throttleRate = isTouch ? 5 : 3;
+    if (timer % throttleRate !== 0) return;
+
     if (player == 'player') {
       let b = document.createElement('div');
       b.className = 'trailBall';

@@ -42,8 +42,6 @@ body {
   font-size: 0;
   color: transparent;
   user-select: none;
-  box-shadow:
-    0 20px 20px black;
   overflow: hidden;
 }
 
@@ -1128,10 +1126,24 @@ main:has(.willem-header.is--loading) {
 /* ============================================
    RESPONSIVE
    ============================================ */
-#game_console {
-  transform-origin: top center;
-  transform: scale(var(--game-scale, 1));
+#game_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(1000px * var(--game-scale, 1));
+  height: calc(550px * var(--game-scale, 1));
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 20px black;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+#game_console {
+  transform-origin: center center;
+  transform: scale(var(--game-scale, 1));
+  flex-shrink: 0;
 }
 
 /* When scaled down, adjust the container to avoid layout overflow */
